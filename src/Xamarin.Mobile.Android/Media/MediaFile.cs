@@ -35,14 +35,14 @@ namespace Xamarin.Media
             throw new ArgumentNullException( "context" );
          }
 
-         string action = self.GetStringExtra( "action" );
+         String action = self.GetStringExtra( "action" );
          if(action == null)
          {
             throw new ArgumentException( "Intent was not results from MediaPicker", "self" );
          }
 
          var uri = (Uri)self.GetParcelableExtra( MediaFile.ExtraName );
-         bool isPhoto = self.GetBooleanExtra( "isPhoto", false );
+         Boolean isPhoto = self.GetBooleanExtra( "isPhoto", false );
          var path = (Uri)self.GetParcelableExtra( "path" );
 
          return
@@ -54,18 +54,18 @@ namespace Xamarin.Media
 
    public sealed class MediaFile : IDisposable
    {
-      internal const string ExtraName = "MediaFile";
-      private readonly bool deletePathOnDispose;
-      private readonly string path;
-      private bool isDisposed;
+      internal const String ExtraName = "MediaFile";
+      private readonly Boolean deletePathOnDispose;
+      private readonly String path;
+      private Boolean isDisposed;
 
-      internal MediaFile( string path, bool deletePathOnDispose )
+      internal MediaFile( String path, Boolean deletePathOnDispose )
       {
          this.deletePathOnDispose = deletePathOnDispose;
          this.path = path;
       }
 
-      public string Path
+      public String Path
       {
          get
          {
@@ -94,7 +94,7 @@ namespace Xamarin.Media
          return File.OpenRead( path );
       }
 
-      private void Dispose( bool disposing )
+      private void Dispose( Boolean disposing )
       {
          if(isDisposed)
          {

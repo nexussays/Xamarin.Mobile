@@ -37,24 +37,24 @@ namespace Xamarin.Contacts
       private ABAddressBook addressBook;
       private IQueryProvider provider;
 
-      public bool AggregateContactsSupported
+      public Boolean AggregateContactsSupported
       {
          get { return false; }
       }
 
-      public bool IsReadOnly
+      public Boolean IsReadOnly
       {
          get { return true; }
       }
 
-      public bool LoadSupported
+      public Boolean LoadSupported
       {
          get { return true; }
       }
 
-      public bool PreferContactAggregation { get; set; }
+      public Boolean PreferContactAggregation { get; set; }
 
-      public bool SingleContactsSupported
+      public Boolean SingleContactsSupported
       {
          get { return true; }
       }
@@ -66,7 +66,7 @@ namespace Xamarin.Contacts
          return addressBook.GetPeople().Select( ContactHelper.GetContact ).GetEnumerator();
       }
 
-      public Contact Load( string id )
+      public Contact Load( String id )
       {
          if(String.IsNullOrWhiteSpace( id ))
          {
@@ -75,7 +75,7 @@ namespace Xamarin.Contacts
 
          CheckStatus();
 
-         int rowId;
+         Int32 rowId;
          if(!Int32.TryParse( id, out rowId ))
          {
             throw new ArgumentException( "Not a valid contact ID", "id" );
@@ -90,9 +90,9 @@ namespace Xamarin.Contacts
          return ContactHelper.GetContact( person );
       }
 
-      public Task<bool> RequestPermission()
+      public Task<Boolean> RequestPermission()
       {
-         var tcs = new TaskCompletionSource<bool>();
+         var tcs = new TaskCompletionSource<Boolean>();
          if(UIDevice.CurrentDevice.CheckSystemVersion( 6, 0 ))
          {
             var status = ABAddressBook.GetAuthorizationStatus();

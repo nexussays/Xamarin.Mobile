@@ -71,7 +71,7 @@ namespace Xamarin.Media
          get { return viewController.View; }
       }
 
-      private bool IsCaptured
+      private Boolean IsCaptured
       {
          get { return source == UIImagePickerControllerSourceType.Camera; }
       }
@@ -81,7 +81,7 @@ namespace Xamarin.Media
          Dismiss( picker, () => tcs.TrySetCanceled() );
       }
 
-      public void DisplayPopover( bool hideFirst = false )
+      public void DisplayPopover( Boolean hideFirst = false )
       {
          if(Popover == null)
          {
@@ -214,14 +214,14 @@ namespace Xamarin.Media
       {
          NSUrl url = (NSUrl)info[UIImagePickerController.MediaURL];
 
-         string path = GetOutputPath(
+         String path = GetOutputPath(
             MediaPicker.TypeMovie,
             options.Directory ?? ((IsCaptured) ? String.Empty : "temp"),
             options.Name ?? Path.GetFileName( url.Path ) );
 
          File.Move( url.Path, path );
 
-         Action<bool> dispose = null;
+         Action<Boolean> dispose = null;
          if(source != UIImagePickerControllerSourceType.Camera)
          {
             dispose = d => File.Delete( path );
@@ -238,7 +238,7 @@ namespace Xamarin.Media
             image = (UIImage)info[UIImagePickerController.OriginalImage];
          }
 
-         string path = GetOutputPath(
+         String path = GetOutputPath(
             MediaPicker.TypeImage,
             options.Directory ?? ((IsCaptured) ? String.Empty : "temp"),
             options.Name );
@@ -250,7 +250,7 @@ namespace Xamarin.Media
             fs.Flush();
          }
 
-         Action<bool> dispose = null;
+         Action<Boolean> dispose = null;
          if(source != UIImagePickerControllerSourceType.Camera)
          {
             dispose = d => File.Delete( path );
@@ -259,7 +259,7 @@ namespace Xamarin.Media
          return new MediaFile( path, () => File.OpenRead( path ), dispose );
       }
 
-      private bool GetShouldRotate( UIDeviceOrientation orientation )
+      private Boolean GetShouldRotate( UIDeviceOrientation orientation )
       {
          UIInterfaceOrientation iorientation = UIInterfaceOrientation.Portrait;
          switch(orientation)
@@ -287,7 +287,7 @@ namespace Xamarin.Media
          return viewController.ShouldAutorotateToInterfaceOrientation( iorientation );
       }
 
-      private bool GetShouldRotate6( UIDeviceOrientation orientation )
+      private Boolean GetShouldRotate6( UIDeviceOrientation orientation )
       {
          if(!viewController.ShouldAutorotate())
          {
@@ -337,14 +337,14 @@ namespace Xamarin.Media
          }
       }
 
-      private static string GetOutputPath( string type, string path, string name )
+      private static String GetOutputPath( String type, String path, String name )
       {
          path = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.Personal ), path );
          Directory.CreateDirectory( path );
 
          if(String.IsNullOrWhiteSpace( name ))
          {
-            string timestamp = DateTime.Now.ToString( "yyyMMdd_HHmmss" );
+            String timestamp = DateTime.Now.ToString( "yyyMMdd_HHmmss" );
             if(type == MediaPicker.TypeImage)
             {
                name = "IMG_" + timestamp + ".jpg";
@@ -358,10 +358,10 @@ namespace Xamarin.Media
          return Path.Combine( path, GetUniquePath( type, path, name ) );
       }
 
-      private static string GetUniquePath( string type, string path, string name )
+      private static String GetUniquePath( String type, String path, String name )
       {
-         bool isPhoto = (type == MediaPicker.TypeImage);
-         string ext = Path.GetExtension( name );
+         Boolean isPhoto = (type == MediaPicker.TypeImage);
+         String ext = Path.GetExtension( name );
          if(ext == String.Empty)
          {
             ext = ((isPhoto) ? ".jpg" : ".mp4");
@@ -369,8 +369,8 @@ namespace Xamarin.Media
 
          name = Path.GetFileNameWithoutExtension( name );
 
-         string nname = name + ext;
-         int i = 1;
+         String nname = name + ext;
+         Int32 i = 1;
          while(File.Exists( Path.Combine( path, nname ) ))
          {
             nname = name + "_" + (i++) + ext;
@@ -379,7 +379,7 @@ namespace Xamarin.Media
          return Path.Combine( path, nname );
       }
 
-      private static bool IsSameOrientationKind( UIDeviceOrientation o1, UIDeviceOrientation o2 )
+      private static Boolean IsSameOrientationKind( UIDeviceOrientation o1, UIDeviceOrientation o2 )
       {
          if(o1 == UIDeviceOrientation.FaceDown || o1 == UIDeviceOrientation.FaceUp)
          {
@@ -397,7 +397,7 @@ namespace Xamarin.Media
          return false;
       }
 
-      private static bool IsValidInterfaceOrientation( UIDeviceOrientation self )
+      private static Boolean IsValidInterfaceOrientation( UIDeviceOrientation self )
       {
          return (self != UIDeviceOrientation.FaceUp && self != UIDeviceOrientation.FaceDown &&
                  self != UIDeviceOrientation.Unknown);

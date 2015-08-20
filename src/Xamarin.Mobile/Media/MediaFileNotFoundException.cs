@@ -20,18 +20,18 @@ namespace Xamarin.Media
 {
    public class MediaFileNotFoundException : Exception
    {
-      public MediaFileNotFoundException( string path )
+      public MediaFileNotFoundException( String path )
          : base( "Unable to locate media file at " + path )
       {
          Path = path;
       }
 
-      public MediaFileNotFoundException( string path, Exception innerException )
+      public MediaFileNotFoundException( String path, Exception innerException )
          : base( "Unable to locate media file at " + path, innerException )
       {
          Path = path;
       }
 
-      public string Path { get; private set; }
+      public String Path { get; private set; }
    }
 }

@@ -46,7 +46,7 @@ namespace Xamarin.Contacts
          return new Query<TElement>( this, expression );
       }
 
-      object IQueryProvider.Execute( Expression expression )
+      Object IQueryProvider.Execute( Expression expression )
       {
          IQueryable<Contact> q = GetContacts().AsQueryable();
 
@@ -72,7 +72,7 @@ namespace Xamarin.Contacts
          return addressBook.GetPeople().Select( ContactHelper.GetContact );
       }
 
-      private Expression ReplaceQueryable( Expression expression, object value )
+      private Expression ReplaceQueryable( Expression expression, Object value )
       {
          MethodCallExpression mc = expression as MethodCallExpression;
          if(mc != null)

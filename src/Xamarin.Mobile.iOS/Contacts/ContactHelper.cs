@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -29,7 +30,7 @@ namespace Xamarin.Contacts
 {
    internal static class ContactHelper
    {
-      internal static AddressType GetAddressType( string label )
+      internal static AddressType GetAddressType( String label )
       {
          if(label == ABLabel.Home)
          {
@@ -153,7 +154,7 @@ namespace Xamarin.Contacts
          return contact;
       }
 
-      internal static EmailType GetEmailType( string label )
+      internal static EmailType GetEmailType( String label )
       {
          if(label == ABLabel.Home)
          {
@@ -167,7 +168,7 @@ namespace Xamarin.Contacts
          return EmailType.Other;
       }
 
-      internal static InstantMessagingService GetImService( string service )
+      internal static InstantMessagingService GetImService( String service )
       {
          if(service == ABPersonInstantMessageService.Aim)
          {
@@ -213,12 +214,12 @@ namespace Xamarin.Contacts
          return InstantMessagingService.Other;
       }
 
-      internal static string GetLabel( NSString label )
+      internal static String GetLabel( NSString label )
       {
          return CultureInfo.CurrentCulture.TextInfo.ToTitleCase( ABAddressBook.LocalizedLabel( label ) );
       }
 
-      internal static PhoneType GetPhoneType( string label )
+      internal static PhoneType GetPhoneType( String label )
       {
          if(label == ABLabel.Home)
          {
@@ -248,7 +249,7 @@ namespace Xamarin.Contacts
          return PhoneType.Other;
       }
 
-      internal static RelationshipType GetRelationType( string label )
+      internal static RelationshipType GetRelationType( String label )
       {
          if(label == ABPersonRelatedNamesLabel.Spouse || label == ABPersonRelatedNamesLabel.Friend)
          {

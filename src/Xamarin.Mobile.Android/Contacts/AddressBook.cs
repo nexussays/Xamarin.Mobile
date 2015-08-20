@@ -48,28 +48,28 @@ namespace Xamarin.Contacts
          contactsProvider = new ContactQueryProvider( context.ContentResolver, context.Resources );
       }
 
-      public bool AggregateContactsSupported
+      public Boolean AggregateContactsSupported
       {
          get { return true; }
       }
 
-      public bool IsReadOnly
+      public Boolean IsReadOnly
       {
          get { return true; }
       }
 
-      public bool LoadSupported
+      public Boolean LoadSupported
       {
          get { return true; }
       }
 
-      public bool PreferContactAggregation
+      public Boolean PreferContactAggregation
       {
          get { return !contactsProvider.UseRawContacts; }
          set { contactsProvider.UseRawContacts = !value; }
       }
 
-      public bool SingleContactsSupported
+      public Boolean SingleContactsSupported
       {
          get { return true; }
       }
@@ -101,7 +101,7 @@ namespace Xamarin.Contacts
       /// <returns>The <see cref="Contact" /> if found, <c>null</c> otherwise.</returns>
       /// <exception cref="ArgumentNullException"><paramref name="id" /> is <c>null</c>.</exception>
       /// <exception cref="ArgumentException"><paramref name="id" /> is empty.</exception>
-      public Contact Load( string id )
+      public Contact Load( String id )
       {
          if(id == null)
          {
@@ -113,7 +113,7 @@ namespace Xamarin.Contacts
          }
 
          Uri curi;
-         string column;
+         String column;
          if(PreferContactAggregation)
          {
             curi = ContactsContract.Contacts.ContentUri;
@@ -140,7 +140,7 @@ namespace Xamarin.Contacts
          }
       }
 
-      public Task<bool> RequestPermission()
+      public Task<Boolean> RequestPermission()
       {
          return Task.Factory.StartNew(
             () =>

@@ -21,14 +21,14 @@ namespace Xamarin.Media
 {
    internal static class MediaExtensions
    {
-      internal static string GetFilePath( this StoreMediaOptions self, string rootPath )
+      internal static String GetFilePath( this StoreMediaOptions self, String rootPath )
       {
-         bool isPhoto = !(self is StoreVideoOptions);
+         Boolean isPhoto = !(self is StoreVideoOptions);
 
-         string name = (self != null) ? self.Name : null;
+         String name = (self != null) ? self.Name : null;
          if(String.IsNullOrWhiteSpace( name ))
          {
-            string timestamp = DateTime.Now.ToString( "yyyyMMdd_HHmmss" );
+            String timestamp = DateTime.Now.ToString( "yyyyMMdd_HHmmss" );
             if(isPhoto)
             {
                name = "IMG_" + timestamp + ".jpg";
@@ -39,7 +39,7 @@ namespace Xamarin.Media
             }
          }
 
-         string ext = Path.GetExtension( name );
+         String ext = Path.GetExtension( name );
          if(ext == String.Empty)
          {
             ext = ((isPhoto) ? ".jpg" : ".mp4");
@@ -47,23 +47,23 @@ namespace Xamarin.Media
 
          name = Path.GetFileNameWithoutExtension( name );
 
-         string folder = Path.Combine(
+         String folder = Path.Combine(
             rootPath ?? String.Empty,
             (self != null && self.Directory != null) ? self.Directory : String.Empty );
 
          return Path.Combine( folder, name + ext );
       }
 
-      internal static string GetUniqueFilepath( this StoreMediaOptions self, string rootPath,
-                                                Func<string, bool> checkExists )
+      internal static String GetUniqueFilepath( this StoreMediaOptions self, String rootPath,
+                                                Func<String, Boolean> checkExists )
       {
-         string path = self.GetFilePath( rootPath );
-         string folder = Path.GetDirectoryName( path );
-         string ext = Path.GetExtension( path );
-         string name = Path.GetFileNameWithoutExtension( path );
+         String path = self.GetFilePath( rootPath );
+         String folder = Path.GetDirectoryName( path );
+         String ext = Path.GetExtension( path );
+         String name = Path.GetFileNameWithoutExtension( path );
 
-         string nname = name + ext;
-         int i = 1;
+         String nname = name + ext;
+         Int32 i = 1;
          while(checkExists( Path.Combine( folder, nname ) ))
          {
             nname = name + "_" + (i++) + ext;

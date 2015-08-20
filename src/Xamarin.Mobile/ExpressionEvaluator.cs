@@ -22,7 +22,7 @@ namespace Xamarin
 {
    public static class ExpressionEvaluator
    {
-      public static Expression Evaluate( Expression expression, Func<Expression, bool> predicate )
+      public static Expression Evaluate( Expression expression, Func<Expression, Boolean> predicate )
       {
          HashSet<Expression> canidates = new EvaluationNominator( predicate ).Nominate( expression );
          return new SubtreeEvaluator( canidates ).Visit( expression );

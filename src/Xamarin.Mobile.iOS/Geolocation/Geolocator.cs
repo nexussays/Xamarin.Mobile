@@ -33,7 +33,7 @@ namespace Xamarin.Geolocation
    public class Geolocator
    {
       private readonly CLLocationManager manager;
-      private bool isListening;
+      private Boolean isListening;
       private Position position;
 
       public Geolocator()
@@ -60,14 +60,14 @@ namespace Xamarin.Geolocation
 
       public event EventHandler<PositionErrorEventArgs> PositionError;
 
-      public double DesiredAccuracy { get; set; }
+      public Double DesiredAccuracy { get; set; }
 
-      public bool IsGeolocationAvailable
+      public Boolean IsGeolocationAvailable
       {
          get { return true; } // all iOS devices support at least wifi geolocation
       }
 
-      public bool IsGeolocationEnabled
+      public Boolean IsGeolocationEnabled
       {
          get
          {
@@ -85,22 +85,22 @@ namespace Xamarin.Geolocation
          }
       }
 
-      public bool IsListening
+      public Boolean IsListening
       {
          get { return isListening; }
       }
 
-      public bool SupportsHeading
+      public Boolean SupportsHeading
       {
          get { return CLLocationManager.HeadingAvailable; }
       }
 
-      public Task<Position> GetPositionAsync( int timeout )
+      public Task<Position> GetPositionAsync( Int32 timeout )
       {
          return GetPositionAsync( timeout, CancellationToken.None, false );
       }
 
-      public Task<Position> GetPositionAsync( int timeout, bool includeHeading )
+      public Task<Position> GetPositionAsync( Int32 timeout, Boolean includeHeading )
       {
          return GetPositionAsync( timeout, CancellationToken.None, includeHeading );
       }
@@ -110,17 +110,17 @@ namespace Xamarin.Geolocation
          return GetPositionAsync( Timeout.Infinite, cancelToken, false );
       }
 
-      public Task<Position> GetPositionAsync( CancellationToken cancelToken, bool includeHeading )
+      public Task<Position> GetPositionAsync( CancellationToken cancelToken, Boolean includeHeading )
       {
          return GetPositionAsync( Timeout.Infinite, cancelToken, includeHeading );
       }
 
-      public Task<Position> GetPositionAsync( int timeout, CancellationToken cancelToken )
+      public Task<Position> GetPositionAsync( Int32 timeout, CancellationToken cancelToken )
       {
          return GetPositionAsync( timeout, cancelToken, false );
       }
 
-      public Task<Position> GetPositionAsync( int timeout, CancellationToken cancelToken, bool includeHeading )
+      public Task<Position> GetPositionAsync( Int32 timeout, CancellationToken cancelToken, Boolean includeHeading )
       {
          if(timeout <= 0 && timeout != Timeout.Infinite)
          {
@@ -181,12 +181,12 @@ namespace Xamarin.Geolocation
          return tcs.Task;
       }
 
-      public void StartListening( int minTime, double minDistance )
+      public void StartListening( Int32 minTime, Double minDistance )
       {
          StartListening( minTime, minDistance, false );
       }
 
-      public void StartListening( int minTime, double minDistance, bool includeHeading )
+      public void StartListening( Int32 minTime, Double minDistance, Boolean includeHeading )
       {
          if(minTime < 0)
          {
@@ -236,7 +236,7 @@ namespace Xamarin.Geolocation
          return m;
       }
 
-      private void OnAuthorizationChanged( object sender, CLAuthorizationChangedEventArgs e )
+      private void OnAuthorizationChanged( Object sender, CLAuthorizationChangedEventArgs e )
       {
          if(e.Status == CLAuthorizationStatus.Denied || e.Status == CLAuthorizationStatus.Restricted)
          {
@@ -244,15 +244,15 @@ namespace Xamarin.Geolocation
          }
       }
 
-      private void OnFailed( object sender, NSErrorEventArgs e )
+      private void OnFailed( Object sender, NSErrorEventArgs e )
       {
-         if((CLError)(int)e.Error.Code == CLError.Network)
+         if((CLError)(Int32)e.Error.Code == CLError.Network)
          {
             OnPositionError( new PositionErrorEventArgs( GeolocationError.PositionUnavailable ) );
          }
       }
 
-      private void OnLocationsUpdated( object sender, CLLocationsUpdatedEventArgs e )
+      private void OnLocationsUpdated( Object sender, CLLocationsUpdatedEventArgs e )
       {
          foreach(CLLocation location in e.Locations)
          {
@@ -280,7 +280,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      private void OnUpdatedHeading( object sender, CLHeadingUpdatedEventArgs e )
+      private void OnUpdatedHeading( Object sender, CLHeadingUpdatedEventArgs e )
       {
          if(e.NewHeading.TrueHeading == -1)
          {
@@ -296,7 +296,7 @@ namespace Xamarin.Geolocation
          OnPositionChanged( new PositionEventArgs( p ) );
       }
 
-      private void OnUpdatedLocation( object sender, CLLocationUpdatedEventArgs e )
+      private void OnUpdatedLocation( Object sender, CLLocationUpdatedEventArgs e )
       {
          UpdatePosition( e.NewLocation );
       }

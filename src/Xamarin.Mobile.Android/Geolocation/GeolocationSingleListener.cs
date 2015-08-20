@@ -28,21 +28,21 @@ namespace Xamarin.Geolocation
       : Object,
         ILocationListener
    {
-      private readonly HashSet<string> activeProviders = new HashSet<string>();
+      private readonly HashSet<String> activeProviders = new HashSet<String>();
       private readonly TaskCompletionSource<Position> completionSource = new TaskCompletionSource<Position>();
-      private readonly float desiredAccuracy;
+      private readonly Single desiredAccuracy;
       private readonly Action finishedCallback;
-      private readonly object locationSync = new object();
+      private readonly Object locationSync = new Object();
       private readonly Timer timer;
       private Location bestLocation;
 
-      public GeolocationSingleListener( float desiredAccuracy, int timeout, IEnumerable<string> activeProviders,
+      public GeolocationSingleListener( Single desiredAccuracy, Int32 timeout, IEnumerable<String> activeProviders,
                                         Action finishedCallback )
       {
          this.desiredAccuracy = desiredAccuracy;
          this.finishedCallback = finishedCallback;
 
-         this.activeProviders = new HashSet<string>( activeProviders );
+         this.activeProviders = new HashSet<String>( activeProviders );
 
          if(timeout != Timeout.Infinite)
          {
@@ -77,7 +77,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      public void OnProviderDisabled( string provider )
+      public void OnProviderDisabled( String provider )
       {
          lock(activeProviders)
          {
@@ -88,12 +88,12 @@ namespace Xamarin.Geolocation
          }
       }
 
-      public void OnProviderEnabled( string provider )
+      public void OnProviderEnabled( String provider )
       {
          lock(activeProviders) activeProviders.Add( provider );
       }
 
-      public void OnStatusChanged( string provider, Availability status, Bundle extras )
+      public void OnStatusChanged( String provider, Availability status, Bundle extras )
       {
          switch(status)
          {
@@ -139,7 +139,7 @@ namespace Xamarin.Geolocation
          completionSource.TrySetResult( p );
       }
 
-      private void TimesUp( object state )
+      private void TimesUp( Object state )
       {
          lock(locationSync)
          {

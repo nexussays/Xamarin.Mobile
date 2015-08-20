@@ -24,7 +24,7 @@ namespace Xamarin
 {
    internal class AsyncQuery<T> : AsyncQueryHandler
    {
-      private readonly Func<ICursor, bool> predicate;
+      private readonly Func<ICursor, Boolean> predicate;
       private readonly Func<ICursor, T> selector;
       private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
 
@@ -39,7 +39,7 @@ namespace Xamarin
          this.selector = selector;
       }
 
-      internal AsyncQuery( ContentResolver cr, Func<ICursor, T> selector, Func<ICursor, bool> predicate )
+      internal AsyncQuery( ContentResolver cr, Func<ICursor, T> selector, Func<ICursor, Boolean> predicate )
          : this( cr, selector )
       {
          this.selector = selector;
@@ -51,9 +51,9 @@ namespace Xamarin
          get { return tcs.Task; }
       }
 
-      protected override void OnQueryComplete( int token, Object cookie, ICursor cursor )
+      protected override void OnQueryComplete( Int32 token, Object cookie, ICursor cursor )
       {
-         bool set = false;
+         Boolean set = false;
          while(cursor.MoveToNext())
          {
             if(predicate == null || predicate( cursor ))

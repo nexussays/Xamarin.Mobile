@@ -42,18 +42,18 @@ namespace Xamarin
       /// </summary>
       /// <param name="type">The type to check.</param>
       /// <returns><c>true</c> if the <paramref name="type" /> is supported, <c>false</c> otherwise.</returns>
-      bool IsSupportedType( Type type );
+      Boolean IsSupportedType( Type type );
    }
 
    internal class TableFindResult
    {
-      internal TableFindResult( Uri table, string mimeType )
+      internal TableFindResult( Uri table, String mimeType )
       {
          Table = table;
          MimeType = mimeType;
       }
 
-      public string MimeType { get; private set; }
+      public String MimeType { get; private set; }
 
       public Uri Table { get; private set; }
    }

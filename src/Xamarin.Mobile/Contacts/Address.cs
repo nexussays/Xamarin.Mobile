@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -25,17 +26,17 @@ namespace Xamarin.Contacts
 
    public class Address
    {
-      public string City { get; set; }
+      public String City { get; set; }
 
-      public string Country { get; set; }
+      public String Country { get; set; }
 
-      public string Label { get; set; }
+      public String Label { get; set; }
 
-      public string PostalCode { get; set; }
+      public String PostalCode { get; set; }
 
-      public string Region { get; set; }
+      public String Region { get; set; }
 
-      public string StreetAddress { get; set; }
+      public String StreetAddress { get; set; }
 
       public AddressType Type { get; set; }
    }

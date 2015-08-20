@@ -54,7 +54,7 @@ namespace Xamarin
          return new Query<TElement>( this, expression );
       }
 
-      object IQueryProvider.Execute( Expression expression )
+      Object IQueryProvider.Execute( Expression expression )
       {
          var translator = new ContentQueryTranslator( this, tableFinder );
          expression = translator.Translate( expression );
@@ -64,7 +64,7 @@ namespace Xamarin
             ICursor cursor = null;
             try
             {
-               string[] projections = (translator.Projections != null)
+               String[] projections = (translator.Projections != null)
                   ? translator.Projections.Where( p => p.Columns != null ).SelectMany( t => t.Columns ).ToArray()
                   : null;
 
@@ -113,7 +113,7 @@ namespace Xamarin
          return (TResult)((IQueryProvider)this).Execute( expression );
       }
 
-      private Expression ReplaceQueryable( Expression expression, object value )
+      private Expression ReplaceQueryable( Expression expression, Object value )
       {
          MethodCallExpression mc = expression as MethodCallExpression;
          if(mc != null)

@@ -31,8 +31,8 @@ namespace Xamarin.Media
 {
    public class MediaPicker
    {
-      internal const string TypeImage = "public.image";
-      internal const string TypeMovie = "public.movie";
+      internal const String TypeImage = "public.image";
+      internal const String TypeMovie = "public.movie";
       private UIImagePickerControllerDelegate pickerDelegate;
       private UIPopoverController popover;
 
@@ -40,13 +40,13 @@ namespace Xamarin.Media
       {
          IsCameraAvailable = UIImagePickerController.IsSourceTypeAvailable( UIImagePickerControllerSourceType.Camera );
 
-         string[] availableCameraMedia =
-            UIImagePickerController.AvailableMediaTypes( UIImagePickerControllerSourceType.Camera ) ?? new string[0];
-         string[] avaialbleLibraryMedia =
+         String[] availableCameraMedia =
+            UIImagePickerController.AvailableMediaTypes( UIImagePickerControllerSourceType.Camera ) ?? new String[0];
+         String[] avaialbleLibraryMedia =
             UIImagePickerController.AvailableMediaTypes( UIImagePickerControllerSourceType.PhotoLibrary ) ??
-            new string[0];
+            new String[0];
 
-         foreach(string type in availableCameraMedia.Concat( avaialbleLibraryMedia ))
+         foreach(String type in availableCameraMedia.Concat( avaialbleLibraryMedia ))
          {
             if(type == TypeMovie)
             {
@@ -59,11 +59,11 @@ namespace Xamarin.Media
          }
       }
 
-      public bool IsCameraAvailable { get; private set; }
+      public Boolean IsCameraAvailable { get; private set; }
 
-      public bool PhotosSupported { get; private set; }
+      public Boolean PhotosSupported { get; private set; }
 
-      public bool VideosSupported { get; private set; }
+      public Boolean VideosSupported { get; private set; }
 
       public MediaPickerController GetPickPhotoUI()
       {
@@ -173,7 +173,7 @@ namespace Xamarin.Media
          return GetMediaAsync( UIImagePickerControllerSourceType.Camera, TypeMovie, options );
       }
 
-      private Task<MediaFile> GetMediaAsync( UIImagePickerControllerSourceType sourceType, string mediaType,
+      private Task<MediaFile> GetMediaAsync( UIImagePickerControllerSourceType sourceType, String mediaType,
                                              StoreCameraMediaOptions options = null )
       {
          UIWindow window = UIApplication.SharedApplication.KeyWindow;
@@ -288,7 +288,7 @@ namespace Xamarin.Media
 
       private static MediaPickerController SetupController( MediaPickerDelegate mpDelegate,
                                                             UIImagePickerControllerSourceType sourceType,
-                                                            string mediaType, StoreCameraMediaOptions options = null )
+                                                            String mediaType, StoreCameraMediaOptions options = null )
       {
          var picker = new MediaPickerController( mpDelegate );
          picker.MediaTypes = new[] {mediaType};

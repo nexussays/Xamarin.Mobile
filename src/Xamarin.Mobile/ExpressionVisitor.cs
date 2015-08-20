@@ -89,7 +89,7 @@ namespace Xamarin
             case ExpressionType.Invoke:
                return VisitInvocation( (InvocationExpression)expression );
             default:
-               throw new ArgumentException( string.Format( "Unhandled expression type: '{0}'", expression.NodeType ) );
+               throw new ArgumentException( String.Format( "Unhandled expression type: '{0}'", expression.NodeType ) );
          }
       }
 
@@ -119,7 +119,7 @@ namespace Xamarin
             case MemberBindingType.Assignment:
                return VisitMemberAssignment( (MemberAssignment)binding );
             default:
-               throw new ArgumentException( string.Format( "Unhandled binding type '{0}'", binding.BindingType ) );
+               throw new ArgumentException( String.Format( "Unhandled binding type '{0}'", binding.BindingType ) );
          }
       }
 
@@ -153,15 +153,15 @@ namespace Xamarin
          return initializer;
       }
 
-      protected bool VisitExpressionList( IEnumerable<Expression> expressions, out Expression[] newExpressions )
+      protected Boolean VisitExpressionList( IEnumerable<Expression> expressions, out Expression[] newExpressions )
       {
          Expression[] args = expressions.ToArray();
 
          newExpressions = new Expression[args.Length];
 
-         bool changed = false;
+         Boolean changed = false;
 
-         for(int i = 0; i < args.Length; ++i)
+         for(Int32 i = 0; i < args.Length; ++i)
          {
             Expression original = args[i];
             Expression current = Visit( original );
@@ -180,7 +180,7 @@ namespace Xamarin
       protected virtual Expression VisitInvocation( InvocationExpression invocation )
       {
          Expression[] args;
-         bool changed = VisitExpressionList( invocation.Arguments, out args );
+         Boolean changed = VisitExpressionList( invocation.Arguments, out args );
 
          Expression e = Visit( invocation.Expression );
          changed = (e != invocation.Expression) || changed;
@@ -196,7 +196,7 @@ namespace Xamarin
       protected virtual Expression VisitLambda( LambdaExpression lambda )
       {
          Expression body = Visit( lambda.Body );
-         bool changed = (body != lambda.Body);
+         Boolean changed = (body != lambda.Body);
 
          Expression[] parameters;
          changed = VisitExpressionList( lambda.Parameters.Cast<Expression>(), out parameters ) || changed;
@@ -233,7 +233,7 @@ namespace Xamarin
 
       protected virtual Expression VisitMethodCall( MethodCallExpression methodCall )
       {
-         bool changed = false;
+         Boolean changed = false;
 
          Expression obj = null;
          if(methodCall.Object != null)

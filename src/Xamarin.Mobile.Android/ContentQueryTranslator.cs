@@ -26,11 +26,11 @@ namespace Xamarin
 {
    internal class ContentQueryTranslator : ExpressionVisitor
    {
-      private readonly List<string> arguments = new List<string>();
+      private readonly List<String> arguments = new List<String>();
       private readonly IQueryProvider provider;
       private readonly StringBuilder queryBuilder = new StringBuilder();
       private readonly ITableFinder tableFinder;
-      private bool fallback = false;
+      private Boolean fallback = false;
       private List<ContentResolverColumnMapping> projections;
       private StringBuilder sortBuilder;
 
@@ -42,37 +42,37 @@ namespace Xamarin
          Take = -1;
       }
 
-      public string[] ClauseParameters
+      public String[] ClauseParameters
       {
          get { return (arguments.Count > 0) ? arguments.ToArray() : null; }
       }
 
-      public bool IsAny { get; private set; }
+      public Boolean IsAny { get; private set; }
 
-      public bool IsCount { get; private set; }
+      public Boolean IsCount { get; private set; }
 
       public IEnumerable<ContentResolverColumnMapping> Projections
       {
          get { return projections; }
       }
 
-      public string QueryString
+      public String QueryString
       {
          get { return (queryBuilder.Length > 0) ? queryBuilder.ToString() : null; }
       }
 
       public Type ReturnType { get; private set; }
 
-      public int Skip { get; private set; }
+      public Int32 Skip { get; private set; }
 
-      public string SortString
+      public String SortString
       {
          get { return (sortBuilder != null) ? sortBuilder.ToString() : null; }
       }
 
       public Uri Table { get; private set; }
 
-      public int Take { get; private set; }
+      public Int32 Take { get; private set; }
 
       public Expression Translate( Expression expression )
       {
@@ -201,7 +201,7 @@ namespace Xamarin
          return null;
       }
 
-      private bool TryGetTable( List<MemberExpression> memberExpressions )
+      private Boolean TryGetTable( List<MemberExpression> memberExpressions )
       {
          if(memberExpressions.Count == 0)
          {
@@ -257,7 +257,7 @@ namespace Xamarin
          return true;
       }
 
-      private bool TryGetTable( MemberExpression me )
+      private Boolean TryGetTable( MemberExpression me )
       {
          if(me == null)
          {
@@ -386,7 +386,7 @@ namespace Xamarin
          }
 
          (projections ?? (projections = new List<ContentResolverColumnMapping>())).Add( column );
-         if(column.ReturnType.IsValueType || column.ReturnType == typeof(string))
+         if(column.ReturnType.IsValueType || column.ReturnType == typeof(String))
          {
             ReturnType = column.ReturnType;
          }
@@ -481,7 +481,7 @@ namespace Xamarin
       private Expression VisitSkip( MethodCallExpression methodCall )
       {
          ConstantExpression ce = (ConstantExpression)methodCall.Arguments[1];
-         Skip = (int)ce.Value;
+         Skip = (Int32)ce.Value;
 
          return methodCall.Arguments[0];
       }
@@ -489,7 +489,7 @@ namespace Xamarin
       private Expression VisitTake( MethodCallExpression methodCall )
       {
          ConstantExpression ce = (ConstantExpression)methodCall.Arguments[1];
-         Take = (int)ce.Value;
+         Take = (Int32)ce.Value;
 
          return methodCall.Arguments[0];
       }
@@ -525,7 +525,7 @@ namespace Xamarin
 
       private class WhereEvaluator : ExpressionVisitor
       {
-         private readonly List<string> arguments = new List<string>();
+         private readonly List<String> arguments = new List<String>();
          private readonly ITableFinder tableFinder;
          private StringBuilder builder = new StringBuilder();
          private ContentResolverColumnMapping currentMap;
@@ -540,14 +540,14 @@ namespace Xamarin
             }
          }
 
-         public List<string> Arguments
+         public List<String> Arguments
          {
             get { return arguments; }
          }
 
-         public bool Fallback { get; private set; }
+         public Boolean Fallback { get; private set; }
 
-         public string QueryString
+         public String QueryString
          {
             get { return builder.ToString(); }
          }
@@ -574,7 +574,7 @@ namespace Xamarin
 
          protected override Expression VisitBinary( BinaryExpression binary )
          {
-            string current = builder.ToString();
+            String current = builder.ToString();
             builder = new StringBuilder();
 
             Visit( binary.Left );
@@ -583,10 +583,10 @@ namespace Xamarin
                return binary;
             }
 
-            string left = builder.ToString();
+            String left = builder.ToString();
             builder = new StringBuilder();
 
-            string joiner;
+            String joiner;
             switch(binary.NodeType)
             {
                case ExpressionType.AndAlso:
@@ -636,7 +636,7 @@ namespace Xamarin
                }
             }
 
-            string right = builder.ToString();
+            String right = builder.ToString();
 
             builder = new StringBuilder( current );
             builder.Append( "(" );
@@ -661,7 +661,7 @@ namespace Xamarin
             }
             else
             {
-               object value = constant.Value;
+               Object value = constant.Value;
                if(currentMap != null && currentMap.ValueToQueryable != null)
                {
                   value = currentMap.ValueToQueryable( value );
@@ -674,7 +674,7 @@ namespace Xamarin
                      return constant;
 
                   case TypeCode.Boolean:
-                     arguments.Add( (bool)value ? "1" : "0" );
+                     arguments.Add( (Boolean)value ? "1" : "0" );
                      builder.Append( "?" );
                      break;
 

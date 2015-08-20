@@ -20,7 +20,7 @@ namespace Xamarin
 {
    internal class ContentResolverColumnMapping
    {
-      public ContentResolverColumnMapping( string column, Type returnType )
+      public ContentResolverColumnMapping( String column, Type returnType )
       {
          if(returnType == null)
          {
@@ -35,8 +35,8 @@ namespace Xamarin
          ReturnType = returnType;
       }
 
-      public ContentResolverColumnMapping( string column, Type returnType, Func<object, object> toQueryable,
-                                           Func<object, object> fromQueryable )
+      public ContentResolverColumnMapping( String column, Type returnType, Func<Object, Object> toQueryable,
+                                           Func<Object, Object> fromQueryable )
          : this( column, returnType )
       {
          if(toQueryable == null)
@@ -52,7 +52,7 @@ namespace Xamarin
          QueryableToValue = fromQueryable;
       }
 
-      public ContentResolverColumnMapping( string[] columns, Type returnType )
+      public ContentResolverColumnMapping( String[] columns, Type returnType )
       {
          if(returnType == null)
          {
@@ -63,8 +63,8 @@ namespace Xamarin
          ReturnType = returnType;
       }
 
-      public ContentResolverColumnMapping( string[] columns, Type returnType, Func<object, object> toQueryable,
-                                           Func<object, object> fromQueryable )
+      public ContentResolverColumnMapping( String[] columns, Type returnType, Func<Object, Object> toQueryable,
+                                           Func<Object, Object> fromQueryable )
          : this( columns, returnType )
       {
          if(toQueryable == null)
@@ -80,12 +80,12 @@ namespace Xamarin
          QueryableToValue = fromQueryable;
       }
 
-      public string[] Columns { get; private set; }
+      public String[] Columns { get; private set; }
 
-      public Func<object, object> QueryableToValue { get; private set; }
+      public Func<Object, Object> QueryableToValue { get; private set; }
 
       public Type ReturnType { get; private set; }
 
-      public Func<object, object> ValueToQueryable { get; private set; }
+      public Func<Object, Object> ValueToQueryable { get; private set; }
    }
 }

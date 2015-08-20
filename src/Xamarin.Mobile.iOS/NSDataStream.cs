@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -31,12 +32,12 @@ namespace Xamarin
       private readonly NSData data;
 
       public NSDataStream( NSData data )
-         : base( (byte*)data.Bytes, (uint)data.Length )
+         : base( (byte*)data.Bytes, (UInt32)data.Length )
       {
          this.data = data;
       }
 
-      protected override void Dispose( bool disposing )
+      protected override void Dispose( Boolean disposing )
       {
          if(disposing)
          {

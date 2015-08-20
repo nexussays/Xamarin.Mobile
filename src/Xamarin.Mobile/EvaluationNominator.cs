@@ -22,11 +22,11 @@ namespace Xamarin
 {
    internal class EvaluationNominator : ExpressionVisitor
    {
-      private readonly Func<Expression, bool> predicate;
+      private readonly Func<Expression, Boolean> predicate;
       private HashSet<Expression> candidates;
-      private bool cannotBeEvaluated;
+      private Boolean cannotBeEvaluated;
 
-      internal EvaluationNominator( Func<Expression, bool> predicate )
+      internal EvaluationNominator( Func<Expression, Boolean> predicate )
       {
          if(predicate == null)
          {
@@ -50,7 +50,7 @@ namespace Xamarin
             return null;
          }
 
-         bool currentState = cannotBeEvaluated;
+         Boolean currentState = cannotBeEvaluated;
          cannotBeEvaluated = false;
 
          base.Visit( expression );

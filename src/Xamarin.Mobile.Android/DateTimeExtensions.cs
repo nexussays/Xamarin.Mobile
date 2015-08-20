@@ -22,9 +22,9 @@ namespace Xamarin
    {
       private static readonly DateTime Epoch = new DateTime( 1970, 1, 1 );
 
-      public static long ToAndroidTimestamp( this DateTime self )
+      public static Int64 ToAndroidTimestamp( this DateTime self )
       {
-         return (long)self.ToUniversalTime().Subtract( Epoch ).TotalMilliseconds;
+         return (Int64)self.ToUniversalTime().Subtract( Epoch ).TotalMilliseconds;
       }
    }
 }

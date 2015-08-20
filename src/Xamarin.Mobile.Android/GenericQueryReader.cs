@@ -28,13 +28,13 @@ namespace Xamarin
    internal class GenericQueryReader<T> : IEnumerable<T>
    {
       private readonly ContentResolver content;
-      private readonly string defaultSort;
+      private readonly String defaultSort;
       private readonly Resources resources;
       private readonly Func<ICursor, Resources, T> selector;
       private readonly ContentQueryTranslator translator;
 
       public GenericQueryReader( ContentQueryTranslator translator, ContentResolver content, Resources resources,
-                                 Func<ICursor, Resources, T> selector, string defaultSort )
+                                 Func<ICursor, Resources, T> selector, String defaultSort )
          : this( translator, content, resources, selector )
       {
          if(defaultSort == null)
@@ -76,7 +76,7 @@ namespace Xamarin
          ICursor cursor = null;
          try
          {
-            string sortString = translator.SortString;
+            String sortString = translator.SortString;
             if((sortString != null || defaultSort != null) && translator != null &&
                (translator.Skip > 0 || translator.Take > 0))
             {
@@ -106,7 +106,7 @@ namespace Xamarin
                sortString = (sortString == null) ? limitb.ToString() : sortString + limitb;
             }
 
-            string[] projections = (translator.Projections != null)
+            String[] projections = (translator.Projections != null)
                ? translator.Projections.Where( p => p.Columns != null ).SelectMany( t => t.Columns ).ToArray()
                : null;
 

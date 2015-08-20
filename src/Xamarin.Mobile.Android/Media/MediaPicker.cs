@@ -29,7 +29,7 @@ namespace Xamarin.Media
    {
       private readonly Context context;
       private TaskCompletionSource<MediaFile> completionSource;
-      private int requestId;
+      private Int32 requestId;
 
       public MediaPicker( Context context )
       {
@@ -47,21 +47,21 @@ namespace Xamarin.Media
          }
       }
 
-      public bool IsCameraAvailable { get; private set; }
+      public Boolean IsCameraAvailable { get; private set; }
 
-      public bool PhotosSupported
+      public Boolean PhotosSupported
       {
          get { return true; }
       }
 
-      public bool VideosSupported
+      public Boolean VideosSupported
       {
          get { return true; }
       }
 
       public Intent GetPickPhotoUI()
       {
-         int id = GetRequestId();
+         Int32 id = GetRequestId();
          return CreateMediaIntent( id, "image/*", Intent.ActionPick, null, tasked: false );
       }
 

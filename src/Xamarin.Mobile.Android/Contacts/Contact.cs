@@ -42,7 +42,7 @@ namespace Xamarin.Contacts
       {
       }
 
-      internal Contact( string id, bool isAggregate, ContentResolver content )
+      internal Contact( String id, Boolean isAggregate, ContentResolver content )
       {
          this.content = content;
          IsAggregate = isAggregate;
@@ -55,7 +55,7 @@ namespace Xamarin.Contacts
          set { addresses = new List<Address>( value ); }
       }
 
-      public string DisplayName { get; set; }
+      public String DisplayName { get; set; }
 
       public IEnumerable<Email> Emails
       {
@@ -63,9 +63,9 @@ namespace Xamarin.Contacts
          set { emails = new List<Email>( value ); }
       }
 
-      public string FirstName { get; set; }
+      public String FirstName { get; set; }
 
-      public string Id { get; private set; }
+      public String Id { get; private set; }
 
       public IEnumerable<InstantMessagingAccount> InstantMessagingAccounts
       {
@@ -73,13 +73,13 @@ namespace Xamarin.Contacts
          set { instantMessagingAccounts = new List<InstantMessagingAccount>( value ); }
       }
 
-      public bool IsAggregate { get; private set; }
+      public Boolean IsAggregate { get; private set; }
 
-      public string LastName { get; set; }
+      public String LastName { get; set; }
 
-      public string MiddleName { get; set; }
+      public String MiddleName { get; set; }
 
-      public string Nickname { get; set; }
+      public String Nickname { get; set; }
 
       public IEnumerable<Note> Notes
       {
@@ -99,7 +99,7 @@ namespace Xamarin.Contacts
          set { phones = new List<Phone>( value ); }
       }
 
-      public string Prefix { get; set; }
+      public String Prefix { get; set; }
 
       public IEnumerable<Relationship> Relationships
       {
@@ -107,7 +107,7 @@ namespace Xamarin.Contacts
          set { relationships = new List<Relationship>( value ); }
       }
 
-      public string Suffix { get; set; }
+      public String Suffix { get; set; }
 
       public IEnumerable<Website> Websites
       {
@@ -117,11 +117,11 @@ namespace Xamarin.Contacts
 
       public Bitmap GetThumbnail()
       {
-         byte[] data = GetThumbnailBytes();
+         Byte[] data = GetThumbnailBytes();
          return (data == null) ? null : BitmapFactory.DecodeByteArray( data, 0, data.Length );
       }
 
-      public Task<MediaFile> SaveThumbnailAsync( string path )
+      public Task<MediaFile> SaveThumbnailAsync( String path )
       {
          if(path == null)
          {
@@ -131,7 +131,7 @@ namespace Xamarin.Contacts
          return Task.Factory.StartNew(
             () =>
             {
-               byte[] bytes = GetThumbnailBytes();
+               Byte[] bytes = GetThumbnailBytes();
                if(bytes == null)
                {
                   return null;
@@ -142,9 +142,9 @@ namespace Xamarin.Contacts
             } );
       }
 
-      private byte[] GetThumbnailBytes()
+      private Byte[] GetThumbnailBytes()
       {
-         string lookupColumn = (IsAggregate)
+         String lookupColumn = (IsAggregate)
             ? ContactsContract.ContactsColumns.LookupKey
             : ContactsContract.RawContactsColumns.ContactId;
 
@@ -160,7 +160,7 @@ namespace Xamarin.Contacts
 
             while(c.MoveToNext())
             {
-               byte[] tdata = c.GetBlob( c.GetColumnIndex( ContactsContract.CommonDataKinds.Photo.PhotoColumnId ) );
+               Byte[] tdata = c.GetBlob( c.GetColumnIndex( ContactsContract.CommonDataKinds.Photo.PhotoColumnId ) );
                if(tdata != null)
                {
                   return tdata;

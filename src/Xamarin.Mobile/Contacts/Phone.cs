@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -29,9 +30,9 @@ namespace Xamarin.Contacts
 
    public class Phone
    {
-      public string Label { get; set; }
+      public String Label { get; set; }
 
-      public string Number { get; set; }
+      public String Number { get; set; }
 
       public PhoneType Type { get; set; }
    }

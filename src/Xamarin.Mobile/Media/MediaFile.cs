@@ -21,12 +21,12 @@ namespace Xamarin.Media
 {
    public sealed class MediaFile : IDisposable
    {
-      private readonly Action<bool> dispose;
-      private readonly string path;
+      private readonly Action<Boolean> dispose;
+      private readonly String path;
       private readonly Func<Stream> streamGetter;
-      private bool isDisposed;
+      private Boolean isDisposed;
 
-      public MediaFile( string path, Func<Stream> streamGetter, Action<bool> dispose = null )
+      public MediaFile( String path, Func<Stream> streamGetter, Action<Boolean> dispose = null )
       {
          // ctor was previously internal, not sure why...
          this.dispose = dispose;
@@ -34,7 +34,7 @@ namespace Xamarin.Media
          this.path = path;
       }
 
-      public string Path
+      public String Path
       {
          get
          {
@@ -63,7 +63,7 @@ namespace Xamarin.Media
          return streamGetter();
       }
 
-      private void Dispose( bool disposing )
+      private void Dispose( Boolean disposing )
       {
          if(isDisposed)
          {

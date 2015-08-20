@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -24,11 +25,11 @@ namespace Xamarin.Contacts
 
    public class Organization
    {
-      public string ContactTitle { get; set; }
+      public String ContactTitle { get; set; }
 
-      public string Label { get; set; }
+      public String Label { get; set; }
 
-      public string Name { get; set; }
+      public String Name { get; set; }
 
       public OrganizationType Type { get; set; }
    }

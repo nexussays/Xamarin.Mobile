@@ -61,7 +61,7 @@ namespace Xamarin.Contacts
          set { addresses = new List<Address>( value ); }
       }
 
-      public string DisplayName { get; set; }
+      public String DisplayName { get; set; }
 
       public IEnumerable<Email> Emails
       {
@@ -69,9 +69,9 @@ namespace Xamarin.Contacts
          set { emails = new List<Email>( value ); }
       }
 
-      public string FirstName { get; set; }
+      public String FirstName { get; set; }
 
-      public string Id { get; private set; }
+      public String Id { get; private set; }
 
       public IEnumerable<InstantMessagingAccount> InstantMessagingAccounts
       {
@@ -79,13 +79,13 @@ namespace Xamarin.Contacts
          set { imAccounts = new List<InstantMessagingAccount>( value ); }
       }
 
-      public bool IsAggregate { get; private set; }
+      public Boolean IsAggregate { get; private set; }
 
-      public string LastName { get; set; }
+      public String LastName { get; set; }
 
-      public string MiddleName { get; set; }
+      public String MiddleName { get; set; }
 
-      public string Nickname { get; set; }
+      public String Nickname { get; set; }
 
       public IEnumerable<Note> Notes
       {
@@ -105,7 +105,7 @@ namespace Xamarin.Contacts
          set { phones = new List<Phone>( value ); }
       }
 
-      public string Prefix { get; set; }
+      public String Prefix { get; set; }
 
       public IEnumerable<Relationship> Relationships
       {
@@ -113,7 +113,7 @@ namespace Xamarin.Contacts
          set { relationships = new List<Relationship>( value ); }
       }
 
-      public string Suffix { get; set; }
+      public String Suffix { get; set; }
 
       public IEnumerable<Website> Websites
       {
@@ -139,7 +139,7 @@ namespace Xamarin.Contacts
          return UIImage.LoadFromData( data );
       }
 
-      public Task<MediaFile> SaveThumbnailAsync( string path )
+      public Task<MediaFile> SaveThumbnailAsync( String path )
       {
          if(path == null)
          {
@@ -149,7 +149,7 @@ namespace Xamarin.Contacts
          return Task<MediaFile>.Factory.StartNew(
             s =>
             {
-               string p = (string)s;
+               String p = (String)s;
 
                using(UIImage img = GetThumbnail())
                {

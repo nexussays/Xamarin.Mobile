@@ -32,31 +32,31 @@ namespace Xamarin.Media
    [Activity]
    internal class MediaPickerActivity : Activity
    {
-      internal const string ExtraAction = "action";
-      internal const string ExtraId = "id";
-      internal const string ExtraLocation = "location";
-      internal const string ExtraPath = "path";
-      internal const string ExtraTasked = "tasked";
-      internal const string ExtraType = "type";
-      private string action;
+      internal const String ExtraAction = "action";
+      internal const String ExtraId = "id";
+      internal const String ExtraLocation = "location";
+      internal const String ExtraPath = "path";
+      internal const String ExtraTasked = "tasked";
+      internal const String ExtraType = "type";
+      private String action;
 
-      private string description;
-      private int id;
-      private bool isPhoto;
+      private String description;
+      private Int32 id;
+      private Boolean isPhoto;
       /// <summary>
       /// The user's destination path.
       /// </summary>
       private Uri path;
       private VideoQuality quality;
-      private int seconds;
+      private Int32 seconds;
 
-      private bool tasked;
-      private string title;
-      private string type;
+      private Boolean tasked;
+      private String title;
+      private String type;
 
       internal static event EventHandler<MediaPickedEventArgs> MediaPicked;
 
-      protected override void OnActivityResult( int requestCode, Result resultCode, Intent data )
+      protected override void OnActivityResult( Int32 requestCode, Result resultCode, Intent data )
       {
          base.OnActivityResult( requestCode, resultCode, data );
 
@@ -110,7 +110,7 @@ namespace Xamarin.Media
 
          Bundle b = (savedInstanceState ?? Intent.Extras);
 
-         bool ran = b.GetBoolean( "ran", defaultValue: false );
+         Boolean ran = b.GetBoolean( "ran", defaultValue: false );
 
          title = b.GetString( MediaStore.MediaColumns.Title );
          description = b.GetString( MediaStore.Images.ImageColumns.Description );

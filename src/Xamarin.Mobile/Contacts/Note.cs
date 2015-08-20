@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -18,6 +19,6 @@ namespace Xamarin.Contacts
 {
    public class Note
    {
-      public string Contents { get; set; }
+      public String Contents { get; set; }
    }
 }

@@ -27,7 +27,7 @@ namespace Xamarin.Contacts
       : ExpressionVisitor,
         ITableFinder
    {
-      private string mimeType;
+      private String mimeType;
       private Uri table;
 
       public Uri DefaultTable
@@ -38,7 +38,7 @@ namespace Xamarin.Contacts
          }
       }
 
-      public bool UseRawContacts { get; set; }
+      public Boolean UseRawContacts { get; set; }
 
       public TableFindResult Find( Expression expression )
       {
@@ -94,7 +94,7 @@ namespace Xamarin.Contacts
          return null;
       }
 
-      public bool IsSupportedType( Type type )
+      public Boolean IsSupportedType( Type type )
       {
          return type == typeof(Contact) || type == typeof(Phone) || type == typeof(Email) || type == typeof(Address) ||
                 type == typeof(Relationship) || type == typeof(InstantMessagingAccount) || type == typeof(Website) ||
@@ -131,19 +131,19 @@ namespace Xamarin.Contacts
             case "City":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredPostal.City,
-                  typeof(string) );
+                  typeof(String) );
             case "Region":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredPostal.Region,
-                  typeof(string) );
+                  typeof(String) );
             case "Country":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredPostal.Country,
-                  typeof(string) );
+                  typeof(String) );
             case "PostalCode":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredPostal.Postcode,
-                  typeof(string) );
+                  typeof(String) );
          }
 
          return null;
@@ -154,40 +154,40 @@ namespace Xamarin.Contacts
          switch(member.Name)
          {
             case "DisplayName":
-               return new ContentResolverColumnMapping( ContactsContract.ContactsColumns.DisplayName, typeof(string) );
+               return new ContentResolverColumnMapping( ContactsContract.ContactsColumns.DisplayName, typeof(String) );
             case "Prefix":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredName.Prefix,
-                  typeof(string) );
+                  typeof(String) );
             case "FirstName":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredName.GivenName,
-                  typeof(string) );
+                  typeof(String) );
             case "LastName":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredName.FamilyName,
-                  typeof(string) );
+                  typeof(String) );
             case "Suffix":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.StructuredName.Suffix,
-                  typeof(string) );
+                  typeof(String) );
 
             case "Phones":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Phone>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Phone>) );
             case "Emails":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Email>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Email>) );
             case "Addresses":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Address>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Address>) );
             case "Notes":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Note>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Note>) );
             case "Relationships":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Relationship>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Relationship>) );
             case "InstantMessagingAccounts":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<InstantMessagingAccount>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<InstantMessagingAccount>) );
             case "Websites":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Website>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Website>) );
             case "Organizations":
-               return new ContentResolverColumnMapping( (string)null, typeof(IEnumerable<Organization>) );
+               return new ContentResolverColumnMapping( (String)null, typeof(IEnumerable<Organization>) );
 
             default:
                return null;
@@ -246,7 +246,7 @@ namespace Xamarin.Contacts
          switch(member.Name)
          {
             case "Address":
-               return new ContentResolverColumnMapping( ContactsContract.DataColumns.Data1, typeof(string) );
+               return new ContentResolverColumnMapping( ContactsContract.DataColumns.Data1, typeof(String) );
          }
 
          return null;
@@ -259,7 +259,7 @@ namespace Xamarin.Contacts
             case "Account":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.CommonColumns.Data,
-                  typeof(string) );
+                  typeof(String) );
          }
 
          return null;
@@ -272,7 +272,7 @@ namespace Xamarin.Contacts
             case "Contents":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.CommonColumns.Data,
-                  typeof(string) );
+                  typeof(String) );
          }
 
          return null;
@@ -285,11 +285,11 @@ namespace Xamarin.Contacts
             case "ContactTitle":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.Organization.Title,
-                  typeof(string) );
+                  typeof(String) );
             case "Name":
                return new ContentResolverColumnMapping(
                   ContactsContract.CommonDataKinds.Organization.Company,
-                  typeof(string) );
+                  typeof(String) );
          }
 
          return null;
@@ -300,7 +300,7 @@ namespace Xamarin.Contacts
          switch(member.Name)
          {
             case "Number":
-               return new ContentResolverColumnMapping( ContactsContract.CommonDataKinds.Phone.Number, typeof(string) );
+               return new ContentResolverColumnMapping( ContactsContract.CommonDataKinds.Phone.Number, typeof(String) );
          }
 
          return null;
@@ -311,7 +311,7 @@ namespace Xamarin.Contacts
          switch(member.Name)
          {
             case "Name":
-               return new ContentResolverColumnMapping( ContactsContract.CommonDataKinds.Relation.Name, typeof(string) );
+               return new ContentResolverColumnMapping( ContactsContract.CommonDataKinds.Relation.Name, typeof(String) );
          }
 
          return null;
@@ -322,7 +322,7 @@ namespace Xamarin.Contacts
          switch(member.Name)
          {
             case "Address":
-               return new ContentResolverColumnMapping( ContactsContract.CommonDataKinds.Website.Url, typeof(string) );
+               return new ContentResolverColumnMapping( ContactsContract.CommonDataKinds.Website.Url, typeof(String) );
          }
 
          return null;

@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -33,10 +34,10 @@ namespace Xamarin.Contacts
 
    public class InstantMessagingAccount
    {
-      public string Account { get; set; }
+      public String Account { get; set; }
 
       public InstantMessagingService Service { get; set; }
 
-      public string ServiceLabel { get; set; }
+      public String ServiceLabel { get; set; }
    }
 }

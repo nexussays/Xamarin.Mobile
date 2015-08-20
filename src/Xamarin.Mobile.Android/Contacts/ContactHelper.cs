@@ -31,12 +31,12 @@ namespace Xamarin.Contacts
 {
    internal static class ContactHelper
    {
-      internal static void FillContactExtras( bool rawContact, ContentResolver content, Resources resources,
-                                              string recordId, Contact contact )
+      internal static void FillContactExtras( Boolean rawContact, ContentResolver content, Resources resources,
+                                              String recordId, Contact contact )
       {
          ICursor c = null;
 
-         string column = (rawContact)
+         String column = (rawContact)
             ? ContactsContract.RawContactsColumns.ContactId
             : ContactsContract.ContactsColumns.LookupKey;
 
@@ -77,8 +77,8 @@ namespace Xamarin.Contacts
             ? ContactsContract.CommonDataKinds.StructuredPostal.GetTypeLabel( resources, kind, String.Empty )
             : c.GetString( ContactsContract.CommonDataKinds.CommonColumns.Label );
 
-         string street = c.GetString( ContactsContract.CommonDataKinds.StructuredPostal.Street );
-         string pobox = c.GetString( ContactsContract.CommonDataKinds.StructuredPostal.Pobox );
+         String street = c.GetString( ContactsContract.CommonDataKinds.StructuredPostal.Street );
+         String pobox = c.GetString( ContactsContract.CommonDataKinds.StructuredPostal.Pobox );
          if(street != null)
          {
             a.StreetAddress = street;
@@ -95,9 +95,9 @@ namespace Xamarin.Contacts
          return a;
       }
 
-      internal static Contact GetContact( bool rawContact, ContentResolver content, Resources resources, ICursor cursor )
+      internal static Contact GetContact( Boolean rawContact, ContentResolver content, Resources resources, ICursor cursor )
       {
-         string id = (rawContact)
+         String id = (rawContact)
             ? cursor.GetString( cursor.GetColumnIndex( ContactsContract.RawContactsColumns.ContactId ) )
             : cursor.GetString( cursor.GetColumnIndex( ContactsContract.ContactsColumns.LookupKey ) );
 
@@ -109,7 +109,7 @@ namespace Xamarin.Contacts
          return contact;
       }
 
-      internal static IEnumerable<Contact> GetContacts( bool rawContacts, ContentResolver content, Resources resources )
+      internal static IEnumerable<Contact> GetContacts( Boolean rawContacts, ContentResolver content, Resources resources )
       {
          Uri curi = (rawContacts) ? ContactsContract.RawContacts.ContentUri : ContactsContract.Contacts.ContentUri;
 
@@ -136,24 +136,24 @@ namespace Xamarin.Contacts
          }
       }
 
-      internal static IEnumerable<Contact> GetContacts( ICursor cursor, bool rawContacts, ContentResolver content,
-                                                        Resources resources, int batchSize )
+      internal static IEnumerable<Contact> GetContacts( ICursor cursor, Boolean rawContacts, ContentResolver content,
+                                                        Resources resources, Int32 batchSize )
       {
          if(cursor == null)
          {
             yield break;
          }
 
-         string column = (rawContacts)
+         String column = (rawContacts)
             ? ContactsContract.RawContactsColumns.ContactId
             : ContactsContract.ContactsColumns.LookupKey;
 
-         string[] ids = new string[batchSize];
-         int columnIndex = cursor.GetColumnIndex( column );
+         String[] ids = new String[batchSize];
+         Int32 columnIndex = cursor.GetColumnIndex( column );
 
-         HashSet<string> uniques = new HashSet<string>();
+         HashSet<String> uniques = new HashSet<String>();
 
-         int i = 0;
+         Int32 i = 0;
          while(cursor.MoveToNext())
          {
             if(i == batchSize)
@@ -165,7 +165,7 @@ namespace Xamarin.Contacts
                }
             }
 
-            string id = cursor.GetString( columnIndex );
+            String id = cursor.GetString( columnIndex );
             if(uniques.Contains( id ))
             {
                continue;
@@ -184,17 +184,17 @@ namespace Xamarin.Contacts
          }
       }
 
-      internal static IEnumerable<Contact> GetContacts( bool rawContacts, ContentResolver content, Resources resources,
-                                                        string[] ids )
+      internal static IEnumerable<Contact> GetContacts( Boolean rawContacts, ContentResolver content, Resources resources,
+                                                        String[] ids )
       {
          ICursor c = null;
 
-         string column = (rawContacts)
+         String column = (rawContacts)
             ? ContactsContract.RawContactsColumns.ContactId
             : ContactsContract.ContactsColumns.LookupKey;
 
          StringBuilder whereb = new StringBuilder();
-         for(int i = 0; i < ids.Length; i++)
+         for(Int32 i = 0; i < ids.Length; i++)
          {
             if(i > 0)
             {
@@ -205,8 +205,8 @@ namespace Xamarin.Contacts
             whereb.Append( "=?" );
          }
 
-         int x = 0;
-         var map = new Dictionary<string, Contact>( ids.Length );
+         Int32 x = 0;
+         var map = new Dictionary<String, Contact>( ids.Length );
 
          try
          {
@@ -223,11 +223,11 @@ namespace Xamarin.Contacts
                yield break;
             }
 
-            int idIndex = c.GetColumnIndex( column );
-            int dnIndex = c.GetColumnIndex( ContactsContract.ContactsColumns.DisplayName );
+            Int32 idIndex = c.GetColumnIndex( column );
+            Int32 dnIndex = c.GetColumnIndex( ContactsContract.ContactsColumns.DisplayName );
             while(c.MoveToNext())
             {
-               string id = c.GetString( idIndex );
+               String id = c.GetString( idIndex );
                if(currentContact == null || currentContact.Id != id)
                {
                   // We need to yield these in the original ID order
@@ -383,7 +383,7 @@ namespace Xamarin.Contacts
       //    }
       //}
 
-      internal static string GetString( this ICursor c, string colName )
+      internal static String GetString( this ICursor c, String colName )
       {
          return c.GetString( c.GetColumnIndex( colName ) );
       }
@@ -489,7 +489,7 @@ namespace Xamarin.Contacts
 
       private static void FillContactWithRow( Resources resources, Contact contact, ICursor c )
       {
-         string dataType = c.GetString( c.GetColumnIndex( ContactsContract.DataColumns.Mimetype ) );
+         String dataType = c.GetString( c.GetColumnIndex( ContactsContract.DataColumns.Mimetype ) );
          switch(dataType)
          {
             case ContactsContract.CommonDataKinds.Nickname.ContentItemType:

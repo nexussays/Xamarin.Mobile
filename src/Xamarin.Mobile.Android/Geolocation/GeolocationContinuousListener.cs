@@ -27,21 +27,21 @@ namespace Xamarin.Geolocation
       : Object,
         ILocationListener
    {
-      private readonly HashSet<string> activeProviders = new HashSet<string>();
+      private readonly HashSet<String> activeProviders = new HashSet<String>();
       private readonly LocationManager manager;
 
-      private string activeProvider;
+      private String activeProvider;
       private Location lastLocation;
-      private IList<string> providers;
+      private IList<String> providers;
       private TimeSpan timePeriod;
 
-      public GeolocationContinuousListener( LocationManager manager, TimeSpan timePeriod, IList<string> providers )
+      public GeolocationContinuousListener( LocationManager manager, TimeSpan timePeriod, IList<String> providers )
       {
          this.manager = manager;
          this.timePeriod = timePeriod;
          this.providers = providers;
 
-         foreach(string p in providers)
+         foreach(String p in providers)
          {
             if(manager.IsProviderEnabled( p ))
             {
@@ -108,7 +108,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      public void OnProviderDisabled( string provider )
+      public void OnProviderDisabled( String provider )
       {
          if(provider == LocationManager.PassiveProvider)
          {
@@ -124,7 +124,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      public void OnProviderEnabled( string provider )
+      public void OnProviderEnabled( String provider )
       {
          if(provider == LocationManager.PassiveProvider)
          {
@@ -134,7 +134,7 @@ namespace Xamarin.Geolocation
          lock(activeProviders) activeProviders.Add( provider );
       }
 
-      public void OnStatusChanged( string provider, Availability status, Bundle extras )
+      public void OnStatusChanged( String provider, Availability status, Bundle extras )
       {
          switch(status)
          {
@@ -148,7 +148,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      private TimeSpan GetTimeSpan( long time )
+      private TimeSpan GetTimeSpan( Int64 time )
       {
          return new TimeSpan( TimeSpan.TicksPerMillisecond * time );
       }

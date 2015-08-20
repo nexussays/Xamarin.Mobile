@@ -39,7 +39,7 @@ namespace Xamarin
 
       public IEnumerator<T> GetEnumerator()
       {
-         string[] projections = null;
+         String[] projections = null;
          if(translator.Projections != null)
          {
             projections = translator.Projections.Where( p => p.Columns != null ).SelectMany( t => t.Columns ).ToArray();
@@ -62,7 +62,7 @@ namespace Xamarin
 
             while(cursor.MoveToNext())
             {
-               int colIndex = cursor.GetColumnIndex( projections[0] );
+               Int32 colIndex = cursor.GetColumnIndex( projections[0] );
                yield return selector( cursor, colIndex );
             }
          }

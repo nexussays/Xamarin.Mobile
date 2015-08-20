@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -25,9 +26,9 @@ namespace Xamarin.Contacts
 
    public class Email
    {
-      public string Address { get; set; }
+      public String Address { get; set; }
 
-      public string Label { get; set; }
+      public String Label { get; set; }
 
       public EmailType Type { get; set; }
    }

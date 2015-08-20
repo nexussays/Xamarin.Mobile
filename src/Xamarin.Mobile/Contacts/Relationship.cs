@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -25,7 +26,7 @@ namespace Xamarin.Contacts
 
    public class Relationship
    {
-      public string Name { get; set; }
+      public String Name { get; set; }
 
       public RelationshipType Type { get; set; }
    }

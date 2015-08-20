@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -39,7 +40,7 @@ namespace Xamarin.Media
          pickerDelegate.Canceled( picker );
       }
 
-      public override bool ShouldDismiss( UIPopoverController popoverController )
+      public override Boolean ShouldDismiss( UIPopoverController popoverController )
       {
          return true;
       }

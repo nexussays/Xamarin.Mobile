@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -18,6 +19,6 @@ namespace Xamarin.Contacts
 {
    public class Website
    {
-      public string Address { get; set; }
+      public String Address { get; set; }
    }
 }

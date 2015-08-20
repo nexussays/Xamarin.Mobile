@@ -1,3 +1,4 @@
+using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -28,13 +29,13 @@ namespace Xamarin.Contacts
 {
    internal class ContactReader : IEnumerable<Contact>
    {
-      private const int BatchSize = 20;
+      private const Int32 BatchSize = 20;
       private readonly ContentResolver content;
-      private readonly bool rawContacts;
+      private readonly Boolean rawContacts;
       private readonly Resources resources;
       private readonly ContentQueryTranslator translator;
 
-      public ContactReader( bool useRawContacts, ContentQueryTranslator translator, ContentResolver content,
+      public ContactReader( Boolean useRawContacts, ContentQueryTranslator translator, ContentResolver content,
                             Resources resources )
       {
          rawContacts = useRawContacts;
@@ -47,10 +48,10 @@ namespace Xamarin.Contacts
       {
          Uri table = (rawContacts) ? ContactsContract.RawContacts.ContentUri : ContactsContract.Contacts.ContentUri;
 
-         string query = null;
-         string[] parameters = null;
-         string sortString = null;
-         string[] projections = null;
+         String query = null;
+         String[] parameters = null;
+         String sortString = null;
+         String[] projections = null;
 
          if(translator != null)
          {

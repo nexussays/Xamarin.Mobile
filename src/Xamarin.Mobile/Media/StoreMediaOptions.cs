@@ -24,9 +24,9 @@ namespace Xamarin.Media
       {
       }
 
-      public string Directory { get; set; }
+      public String Directory { get; set; }
 
-      public string Name { get; set; }
+      public String Name { get; set; }
    }
 
    public enum CameraDevice

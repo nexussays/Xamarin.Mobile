@@ -28,7 +28,7 @@ namespace Xamarin.Contacts
       {
       }
 
-      public bool UseRawContacts
+      public Boolean UseRawContacts
       {
          get { return ((ContactTableFinder)TableFinder).UseRawContacts; }
          set { ((ContactTableFinder)TableFinder).UseRawContacts = value; }
@@ -76,13 +76,13 @@ namespace Xamarin.Contacts
          {
             return new GenericQueryReader<Note>( translator, content, resources, ContactHelper.GetNote );
          }
-         else if(translator.ReturnType == typeof(string))
+         else if(translator.ReturnType == typeof(String))
          {
-            return new ProjectionReader<string>( content, translator, ( cur, col ) => cur.GetString( col ) );
+            return new ProjectionReader<String>( content, translator, ( cur, col ) => cur.GetString( col ) );
          }
-         else if(translator.ReturnType == typeof(int))
+         else if(translator.ReturnType == typeof(Int32))
          {
-            return new ProjectionReader<int>( content, translator, ( cur, col ) => cur.GetInt( col ) );
+            return new ProjectionReader<Int32>( content, translator, ( cur, col ) => cur.GetInt( col ) );
          }
 
          throw new ArgumentException();

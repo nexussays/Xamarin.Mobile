@@ -30,17 +30,17 @@ namespace Xamarin.Geolocation
 {
    internal class GeolocationSingleUpdateDelegate : CLLocationManagerDelegate
    {
-      private readonly double desiredAccuracy;
-      private readonly bool includeHeading;
+      private readonly Double desiredAccuracy;
+      private readonly Boolean includeHeading;
       private readonly CLLocationManager manager;
       private readonly Position position = new Position();
       private readonly TaskCompletionSource<Position> tcs;
       private CLHeading bestHeading;
-      private bool haveHeading;
-      private bool haveLocation;
+      private Boolean haveHeading;
+      private Boolean haveLocation;
 
-      public GeolocationSingleUpdateDelegate( CLLocationManager manager, double desiredAccuracy, bool includeHeading,
-                                              int timeout, CancellationToken cancelToken )
+      public GeolocationSingleUpdateDelegate( CLLocationManager manager, Double desiredAccuracy, Boolean includeHeading,
+                                              Int32 timeout, CancellationToken cancelToken )
       {
          this.manager = manager;
          tcs = new TaskCompletionSource<Position>( manager );
@@ -95,7 +95,7 @@ namespace Xamarin.Geolocation
 
       public override void Failed( CLLocationManager manager, NSError error )
       {
-         switch((CLError)(int)error.Code)
+         switch((CLError)(Int32)error.Code)
          {
             case CLError.Network:
                StopListening();
@@ -104,7 +104,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      public override bool ShouldDisplayHeadingCalibration( CLLocationManager manager )
+      public override Boolean ShouldDisplayHeadingCalibration( CLLocationManager manager )
       {
          return true;
       }
