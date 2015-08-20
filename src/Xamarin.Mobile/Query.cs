@@ -22,48 +22,47 @@ using System.Linq.Expressions;
 
 namespace Xamarin
 {
-	public class Query<T>
-		: IOrderedQueryable<T>
-	{
-		public Query (IQueryProvider provider)
-		{
-			this.provider = provider;
-			this.expression = Expression.Constant (this);
-		}
+   public class Query<T> : IOrderedQueryable<T>
+   {
+      private readonly Expression expression;
+      private readonly IQueryProvider provider;
 
-		public Query (IQueryProvider provider, Expression expression)
-		{
-			this.provider = provider;
-			this.expression = expression;
-		}
+      public Query( IQueryProvider provider )
+      {
+         this.provider = provider;
+         expression = Expression.Constant( this );
+      }
 
-		public IEnumerator<T> GetEnumerator()
-		{
-			var enumerable = ((IEnumerable<T>) this.provider.Execute (this.expression));
-			return (enumerable ?? Enumerable.Empty<T>()).GetEnumerator();
-		}
+      public Query( IQueryProvider provider, Expression expression )
+      {
+         this.provider = provider;
+         this.expression = expression;
+      }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+      public Type ElementType
+      {
+         get { return typeof(T); }
+      }
 
-		public Type ElementType
-		{
-			get { return typeof (T); }
-		}
+      public Expression Expression
+      {
+         get { return expression; }
+      }
 
-		public Expression Expression
-		{
-			get { return this.expression; }
-		}
+      public IQueryProvider Provider
+      {
+         get { return provider; }
+      }
 
-		public IQueryProvider Provider
-		{
-			get { return this.provider; }
-		}
+      public IEnumerator<T> GetEnumerator()
+      {
+         var enumerable = ((IEnumerable<T>)provider.Execute( expression ));
+         return (enumerable ?? Enumerable.Empty<T>()).GetEnumerator();
+      }
 
-		private readonly Expression expression;
-		private readonly IQueryProvider provider;
-	}
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+         return GetEnumerator();
+      }
+   }
 }

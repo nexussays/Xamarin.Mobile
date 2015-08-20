@@ -15,9 +15,9 @@
 //
 
 using System.IO;
-
 #if __UNIFIED__
 using Foundation;
+
 #else
 using MonoTouch.Foundation;
 
@@ -26,23 +26,24 @@ using nuint = global::System.UInt32;
 
 namespace Xamarin
 {
-	internal unsafe class NSDataStream
-		: UnmanagedMemoryStream
-	{
-		public NSDataStream (NSData data)
-			: base ((byte*)data.Bytes, (uint)data.Length)
-		{
-			this.data = data;
-		}
+   internal unsafe class NSDataStream : UnmanagedMemoryStream
+   {
+      private readonly NSData data;
 
-		private readonly NSData data;
+      public NSDataStream( NSData data )
+         : base( (byte*)data.Bytes, (uint)data.Length )
+      {
+         this.data = data;
+      }
 
-		protected override void Dispose (bool disposing)
-		{
-			if (disposing)
-				this.data.Dispose();
+      protected override void Dispose( bool disposing )
+      {
+         if(disposing)
+         {
+            data.Dispose();
+         }
 
-			base.Dispose (disposing);
-		}
-	}
+         base.Dispose( disposing );
+      }
+   }
 }

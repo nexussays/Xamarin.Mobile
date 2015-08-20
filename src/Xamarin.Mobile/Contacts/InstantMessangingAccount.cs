@@ -16,39 +16,27 @@
 
 namespace Xamarin.Contacts
 {
-	public enum InstantMessagingService
-	{
-		Aim,
-		Msn,
-		Yahoo,
-		Icq,
-		Jabber,
-		Other,
-        Skype,
-        Facebook,
-        Google,
-        GaduGadu,
-        QQ
-	}
+   public enum InstantMessagingService
+   {
+      Aim,
+      Msn,
+      Yahoo,
+      Icq,
+      Jabber,
+      Other,
+      Skype,
+      Facebook,
+      Google,
+      GaduGadu,
+      QQ
+   }
 
-	public class InstantMessagingAccount
-	{
-		public InstantMessagingService Service
-		{
-			get;
-			set;
-		}
+   public class InstantMessagingAccount
+   {
+      public string Account { get; set; }
 
-		public string ServiceLabel
-		{
-			get;
-			set;
-		}
+      public InstantMessagingService Service { get; set; }
 
-		public string Account
-		{
-			get;
-			set;
-		}
-	}
+      public string ServiceLabel { get; set; }
+   }
 }

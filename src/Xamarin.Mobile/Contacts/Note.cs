@@ -16,12 +16,8 @@
 
 namespace Xamarin.Contacts
 {
-	public class Note
-	{
-		public string Contents
-		{
-			get;
-			set;
-		}
-	}
+   public class Note
+   {
+      public string Contents { get; set; }
+   }
 }

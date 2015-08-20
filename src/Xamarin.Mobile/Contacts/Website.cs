@@ -16,12 +16,8 @@
 
 namespace Xamarin.Contacts
 {
-	public class Website
-	{
-		public string Address
-		{
-			get;
-			set;
-		}
-	}
+   public class Website
+   {
+      public string Address { get; set; }
+   }
 }

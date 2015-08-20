@@ -19,60 +19,67 @@ using System.IO;
 
 namespace Xamarin.Media
 {
-	public sealed class MediaFile
-		: IDisposable
-	{
+   public sealed class MediaFile : IDisposable
+   {
+      private readonly Action<bool> dispose;
+      private readonly string path;
+      private readonly Func<Stream> streamGetter;
+      private bool isDisposed;
+
       public MediaFile( string path, Func<Stream> streamGetter, Action<bool> dispose = null )
-		{
+      {
          // ctor was previously internal, not sure why...
-			this.dispose = dispose;
-			this.streamGetter = streamGetter;
-			this.path = path;
-		}
+         this.dispose = dispose;
+         this.streamGetter = streamGetter;
+         this.path = path;
+      }
 
-		public string Path
-		{
-			get
-			{
-				if (this.isDisposed)
-					throw new ObjectDisposedException (null);
+      public string Path
+      {
+         get
+         {
+            if(isDisposed)
+            {
+               throw new ObjectDisposedException( null );
+            }
 
-				return this.path;
-			}
-		}
+            return path;
+         }
+      }
 
-		public Stream GetStream()
-		{
-			if (this.isDisposed)
-				throw new ObjectDisposedException (null);
+      public void Dispose()
+      {
+         Dispose( true );
+         GC.SuppressFinalize( this );
+      }
 
-			return this.streamGetter();
-		}
+      public Stream GetStream()
+      {
+         if(isDisposed)
+         {
+            throw new ObjectDisposedException( null );
+         }
 
-		public void Dispose()
-		{
-			Dispose (true);
-			GC.SuppressFinalize (this);
-		}
+         return streamGetter();
+      }
 
-		private bool isDisposed;
-		private readonly Action<bool> dispose;
-		private readonly Func<Stream> streamGetter;
-		private readonly string path;
-		
-		private void Dispose (bool disposing)
-		{
-			if (this.isDisposed)
-				return;
+      private void Dispose( bool disposing )
+      {
+         if(isDisposed)
+         {
+            return;
+         }
 
-			this.isDisposed = true;
-			if (this.dispose != null)
-				this.dispose (disposing);
-		}
+         isDisposed = true;
+         if(dispose != null)
+         {
+            dispose( disposing );
+         }
+      }
 
-		~MediaFile()
-		{
-			Dispose (false);
-		}
-	}
+      ~MediaFile()
+      {
+         Dispose( false );
+      }
+   }
 }

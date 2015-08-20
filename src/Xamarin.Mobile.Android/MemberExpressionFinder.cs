@@ -20,39 +20,46 @@ using System.Linq.Expressions;
 
 namespace Xamarin
 {
-	internal class MemberExpressionFinder
-		: ExpressionVisitor
-	{
-		internal MemberExpressionFinder (ITableFinder tableFinder)
-		{
-			if (tableFinder == null)
-				throw new ArgumentNullException ("tableFinder");
+   internal class MemberExpressionFinder : ExpressionVisitor
+   {
+      private readonly List<MemberExpression> expressions = new List<MemberExpression>();
+      private readonly ITableFinder tableFinder;
 
-			this.tableFinder = tableFinder;
-		}
+      internal MemberExpressionFinder( ITableFinder tableFinder )
+      {
+         if(tableFinder == null)
+         {
+            throw new ArgumentNullException( "tableFinder" );
+         }
 
-		private readonly List<MemberExpression> expressions = new List<MemberExpression>();
-		private readonly ITableFinder tableFinder;
+         this.tableFinder = tableFinder;
+      }
 
       protected override Expression VisitMember( MemberExpression member )
-		{
-			if (this.tableFinder.IsSupportedType (member.Member.DeclaringType))
-				this.expressions.Add (member);
+      {
+         if(tableFinder.IsSupportedType( member.Member.DeclaringType ))
+         {
+            expressions.Add( member );
+         }
 
-         return base.VisitMember(member);
-		}
+         return base.VisitMember( member );
+      }
 
-		internal static List<MemberExpression> Find (Expression expression, ITableFinder tableFinder)
-		{
-			if (expression == null)
-				throw new ArgumentNullException ("expression");
-			if (tableFinder == null)
-				throw new ArgumentNullException ("tableFinder");
+      internal static List<MemberExpression> Find( Expression expression, ITableFinder tableFinder )
+      {
+         if(expression == null)
+         {
+            throw new ArgumentNullException( "expression" );
+         }
+         if(tableFinder == null)
+         {
+            throw new ArgumentNullException( "tableFinder" );
+         }
 
-			var finder = new MemberExpressionFinder (tableFinder);
-			finder.Visit (expression);
+         var finder = new MemberExpressionFinder( tableFinder );
+         finder.Visit( expression );
 
-			return finder.expressions;
-		}
-	}
+         return finder.expressions;
+      }
+   }
 }

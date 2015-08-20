@@ -14,15 +14,14 @@
 //    limitations under the License.
 //
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using System;
 using System.Runtime.InteropServices;
-
+using System.Threading.Tasks;
+using Xamarin.Media;
 #if __UNIFIED__
 using AddressBook;
-using CoreGraphics;
 using Foundation;
 using UIKit;
 #else
@@ -32,176 +31,147 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 #endif
 
-using Xamarin.Media;
-
 namespace Xamarin.Contacts
 {
-	public class Contact
-	{
-		public Contact()
-		{
-		}
-		
-		internal Contact (ABPerson person)
-		{
-			Id = person.Id.ToString();
-			this.person = person;
-		}
+   public class Contact
+   {
+      internal List<Address> addresses = new List<Address>();
+      internal List<Email> emails = new List<Email>();
+      internal List<InstantMessagingAccount> imAccounts = new List<InstantMessagingAccount>();
+      internal List<Note> notes = new List<Note>();
+      internal List<Organization> organizations = new List<Organization>();
+      internal List<Phone> phones = new List<Phone>();
+      internal List<Relationship> relationships = new List<Relationship>();
+      internal List<Website> websites = new List<Website>();
+      private readonly ABPerson person;
 
-		public string Id
-		{
-			get;
-			private set;
-		}
+      public Contact()
+      {
+      }
 
-		public bool IsAggregate
-		{
-			get;
-			private set;
-		}
+      internal Contact( ABPerson person )
+      {
+         Id = person.Id.ToString();
+         this.person = person;
+      }
 
-		public string DisplayName
-		{
-			get;
-			set;
-		}
+      public IEnumerable<Address> Addresses
+      {
+         get { return addresses; }
+         set { addresses = new List<Address>( value ); }
+      }
 
-		public string Prefix
-		{
-			get;
-			set;
-		}
+      public string DisplayName { get; set; }
 
-		public string FirstName
-		{
-			get;
-			set;
-		}
+      public IEnumerable<Email> Emails
+      {
+         get { return emails; }
+         set { emails = new List<Email>( value ); }
+      }
 
-		public string MiddleName
-		{
-			get;
-			set;
-		}
+      public string FirstName { get; set; }
 
-		public string LastName
-		{
-			get;
-			set;
-		}
+      public string Id { get; private set; }
 
-		public string Nickname
-		{
-			get;
-			set;
-		}
+      public IEnumerable<InstantMessagingAccount> InstantMessagingAccounts
+      {
+         get { return imAccounts; }
+         set { imAccounts = new List<InstantMessagingAccount>( value ); }
+      }
 
-		public string Suffix
-		{
-			get;
-			set;
-		}
+      public bool IsAggregate { get; private set; }
 
-		internal List<Relationship> relationships = new List<Relationship>();
-		public IEnumerable<Relationship> Relationships
-		{
-			get { return this.relationships; }
-			set { this.relationships = new List<Relationship> (value); }
-		}
+      public string LastName { get; set; }
 
-		internal List<Address> addresses = new List<Address>();
-		public IEnumerable<Address> Addresses
-		{
-			get { return this.addresses; }
-			set { this.addresses = new List<Address> (value); }
-		}
+      public string MiddleName { get; set; }
 
-		internal List<InstantMessagingAccount> imAccounts = new List<InstantMessagingAccount>();
-		public IEnumerable<InstantMessagingAccount> InstantMessagingAccounts
-		{
-			get { return this.imAccounts; }
-			set { this.imAccounts = new List<InstantMessagingAccount> (value); }
-		}
+      public string Nickname { get; set; }
 
-		internal List<Website> websites = new List<Website>();
-		public IEnumerable<Website> Websites
-		{
-			get { return this.websites; }
-			set { this.websites = new List<Website> (value); }
-		}
+      public IEnumerable<Note> Notes
+      {
+         get { return notes; }
+         set { notes = new List<Note>( value ); }
+      }
 
-		internal List<Organization> organizations = new List<Organization>();
-		public IEnumerable<Organization> Organizations
-		{
-			get { return this.organizations; }
-			set { this.organizations = new List<Organization> (value); }
-		}
+      public IEnumerable<Organization> Organizations
+      {
+         get { return organizations; }
+         set { organizations = new List<Organization>( value ); }
+      }
 
-		internal List<Note> notes = new List<Note>();
-		public IEnumerable<Note> Notes
-		{
-			get { return this.notes; }
-			set { this.notes = new List<Note> (value); }
-		}
+      public IEnumerable<Phone> Phones
+      {
+         get { return phones; }
+         set { phones = new List<Phone>( value ); }
+      }
 
-		internal List<Email> emails = new List<Email>();
-		public IEnumerable<Email> Emails
-		{
-			get { return this.emails; }
-			set { this.emails = new List<Email> (value); }
-		}
+      public string Prefix { get; set; }
 
-		internal List<Phone> phones = new List<Phone>();
-		public IEnumerable<Phone> Phones
-		{
-			get { return this.phones; }
-			set { this.phones = new List<Phone> (value); }
-		}
+      public IEnumerable<Relationship> Relationships
+      {
+         get { return relationships; }
+         set { relationships = new List<Relationship>( value ); }
+      }
 
-		public UIImage GetThumbnail()
-		{
-			if (!this.person.HasImage)
-				return null;
+      public string Suffix { get; set; }
 
-			NSData data;
-            lock (this.person)
-                data = this.person.GetImage (ABPersonImageFormat.Thumbnail);
+      public IEnumerable<Website> Websites
+      {
+         get { return websites; }
+         set { websites = new List<Website>( value ); }
+      }
 
-			if (data == null)
-				return null;
+      public UIImage GetThumbnail()
+      {
+         if(!person.HasImage)
+         {
+            return null;
+         }
 
-            return UIImage.LoadFromData (data);
-		}
+         NSData data;
+         lock(person) data = person.GetImage( ABPersonImageFormat.Thumbnail );
 
-		public Task<MediaFile> SaveThumbnailAsync (string path)
-		{
-			if (path == null)
-				throw new ArgumentNullException ("path");
+         if(data == null)
+         {
+            return null;
+         }
 
-			return Task<MediaFile>.Factory.StartNew (s =>
-			{
-				string p = (string) s;
+         return UIImage.LoadFromData( data );
+      }
 
-				using (UIImage img = GetThumbnail())
-				{
-					if (img == null)
-						return null;
+      public Task<MediaFile> SaveThumbnailAsync( string path )
+      {
+         if(path == null)
+         {
+            throw new ArgumentNullException( "path" );
+         }
 
-					using (NSDataStream stream = new NSDataStream (img.AsJPEG()))
-					using (Stream fs = File.OpenWrite (p))
-					{
-						stream.CopyTo (fs);
-						fs.Flush();
-					}
-				}
+         return Task<MediaFile>.Factory.StartNew(
+            s =>
+            {
+               string p = (string)s;
 
-				return new MediaFile (p, () => File.OpenRead (path));
-			}, path);
-		}
+               using(UIImage img = GetThumbnail())
+               {
+                  if(img == null)
+                  {
+                     return null;
+                  }
 
-		private readonly ABPerson person;
+                  using(NSDataStream stream = new NSDataStream( img.AsJPEG() ))
+                  using(Stream fs = File.OpenWrite( p ))
+                  {
+                     stream.CopyTo( fs );
+                     fs.Flush();
+                  }
+               }
 
-		[DllImport ("/System/Library/Frameworks/AddressBook.framework/AddressBook")]
-		private static extern IntPtr ABPersonCopyImageDataWithFormat (IntPtr handle, ABPersonImageFormat format);
-	}
+               return new MediaFile( p, () => File.OpenRead( path ) );
+            },
+            path );
+      }
+
+      [DllImport( "/System/Library/Frameworks/AddressBook.framework/AddressBook" )]
+      private static extern IntPtr ABPersonCopyImageDataWithFormat( IntPtr handle, ABPersonImageFormat format );
+   }
 }

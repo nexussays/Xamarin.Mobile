@@ -14,7 +14,6 @@
 //    limitations under the License.
 //
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,100 +21,110 @@ using System.Text;
 using Android.Content;
 using Android.Content.Res;
 using Android.Database;
+using Android.Net;
 using Android.Provider;
 
 namespace Xamarin.Contacts
 {
-	internal class ContactReader
-		: IEnumerable<Contact>
-	{
-		public ContactReader (bool useRawContacts, ContentQueryTranslator translator, ContentResolver content, Resources resources)
-		{
-			this.rawContacts = useRawContacts;
-			this.translator = translator;
-			this.content = content;
-			this.resources = resources;
-		}
+   internal class ContactReader : IEnumerable<Contact>
+   {
+      private const int BatchSize = 20;
+      private readonly ContentResolver content;
+      private readonly bool rawContacts;
+      private readonly Resources resources;
+      private readonly ContentQueryTranslator translator;
 
-		public IEnumerator<Contact> GetEnumerator()
-		{
-			Android.Net.Uri table = (this.rawContacts)
-										? ContactsContract.RawContacts.ContentUri
-										: ContactsContract.Contacts.ContentUri;
+      public ContactReader( bool useRawContacts, ContentQueryTranslator translator, ContentResolver content,
+                            Resources resources )
+      {
+         rawContacts = useRawContacts;
+         this.translator = translator;
+         this.content = content;
+         this.resources = resources;
+      }
 
-			string query = null;
-			string[] parameters = null;
-			string sortString = null;
-			string[] projections = null;
+      public IEnumerator<Contact> GetEnumerator()
+      {
+         Uri table = (rawContacts) ? ContactsContract.RawContacts.ContentUri : ContactsContract.Contacts.ContentUri;
 
-			if (this.translator != null)
-			{
-				table = this.translator.Table;
-				query = this.translator.QueryString;
-				parameters = this.translator.ClauseParameters;
-				sortString = this.translator.SortString;
+         string query = null;
+         string[] parameters = null;
+         string sortString = null;
+         string[] projections = null;
 
-				if (this.translator.Projections != null)
-				{
-					projections = this.translator.Projections
-									.Where (p => p.Columns != null)
-									.SelectMany (t => t.Columns)
-									.ToArray();
+         if(translator != null)
+         {
+            table = translator.Table;
+            query = translator.QueryString;
+            parameters = translator.ClauseParameters;
+            sortString = translator.SortString;
 
-					if (projections.Length == 0)
-						projections = null;
-				}
+            if(translator.Projections != null)
+            {
+               projections =
+                  translator.Projections.Where( p => p.Columns != null ).SelectMany( t => t.Columns ).ToArray();
 
-				if (this.translator.Skip > 0 || this.translator.Take > 0)
-				{
-					StringBuilder limitb = new StringBuilder();
+               if(projections.Length == 0)
+               {
+                  projections = null;
+               }
+            }
 
-					if (sortString == null)
-						limitb.Append (ContactsContract.ContactsColumns.LookupKey);
+            if(translator.Skip > 0 || translator.Take > 0)
+            {
+               StringBuilder limitb = new StringBuilder();
 
-					limitb.Append (" LIMIT ");
+               if(sortString == null)
+               {
+                  limitb.Append( ContactsContract.ContactsColumns.LookupKey );
+               }
 
-					if (this.translator.Skip > 0)
-					{
-						limitb.Append (this.translator.Skip);
-						if (this.translator.Take > 0)
-							limitb.Append (",");
-					}
+               limitb.Append( " LIMIT " );
 
-					if (this.translator.Take > 0)
-						limitb.Append (this.translator.Take);
+               if(translator.Skip > 0)
+               {
+                  limitb.Append( translator.Skip );
+                  if(translator.Take > 0)
+                  {
+                     limitb.Append( "," );
+                  }
+               }
 
-					sortString = (sortString == null) ? limitb.ToString() : sortString + limitb;
-				}
-			}
+               if(translator.Take > 0)
+               {
+                  limitb.Append( translator.Take );
+               }
 
-			ICursor cursor = null;
-			try
-			{
-				cursor = this.content.Query (table, projections, query, parameters, sortString);
-				if (cursor == null)
-					yield break;
+               sortString = (sortString == null) ? limitb.ToString() : sortString + limitb;
+            }
+         }
 
-				foreach (Contact contact in ContactHelper.GetContacts (cursor, this.rawContacts, this.content, this.resources, BatchSize))
-				    yield return contact;
-			}
-			finally
-			{
-				if (cursor != null)
-					cursor.Close();
-			}
-		}
+         ICursor cursor = null;
+         try
+         {
+            cursor = content.Query( table, projections, query, parameters, sortString );
+            if(cursor == null)
+            {
+               yield break;
+            }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+            foreach(Contact contact in ContactHelper.GetContacts( cursor, rawContacts, content, resources, BatchSize ))
+            {
+               yield return contact;
+            }
+         }
+         finally
+         {
+            if(cursor != null)
+            {
+               cursor.Close();
+            }
+         }
+      }
 
-		private readonly bool rawContacts;
-		private readonly ContentQueryTranslator translator;
-		private readonly ContentResolver content;
-		private readonly Resources resources;
-
-		private const int BatchSize = 20;
-	}
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+         return GetEnumerator();
+      }
+   }
 }

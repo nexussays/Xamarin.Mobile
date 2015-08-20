@@ -16,15 +16,13 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-
 #if __UNIFIED__
 using CoreGraphics;
-using AssetsLibrary;
 using Foundation;
 using UIKit;
-using NSAction = global::System.Action;
+using NSAction = System.Action;
+
 #else
 using MonoTouch.AssetsLibrary;
 using MonoTouch.Foundation;
@@ -36,323 +34,373 @@ using nfloat = global::System.Single;
 
 namespace Xamarin.Media
 {
-	internal class MediaPickerDelegate
-		: UIImagePickerControllerDelegate
-	{
-		internal MediaPickerDelegate (UIViewController viewController, UIImagePickerControllerSourceType sourceType, StoreCameraMediaOptions options)
-		{
-			this.viewController = viewController;
-			this.source = sourceType;
-			this.options = options ?? new StoreCameraMediaOptions();
+   internal class MediaPickerDelegate : UIImagePickerControllerDelegate
+   {
+      private readonly NSObject observer;
+      private readonly StoreCameraMediaOptions options;
+      private readonly UIImagePickerControllerSourceType source;
+      private readonly TaskCompletionSource<MediaFile> tcs = new TaskCompletionSource<MediaFile>();
+      private readonly UIViewController viewController;
+      private UIDeviceOrientation? orientation;
 
-			if (viewController != null) {
-				UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
-				this.observer = NSNotificationCenter.DefaultCenter.AddObserver (UIDevice.OrientationDidChangeNotification, DidRotate);
-			}
-		}
-		
-		public UIPopoverController Popover
-		{
-			get;
-			set;
-		}
-		
-		public UIView View
-		{
-			get { return this.viewController.View; }
-		}
+      internal MediaPickerDelegate( UIViewController viewController, UIImagePickerControllerSourceType sourceType,
+                                    StoreCameraMediaOptions options )
+      {
+         this.viewController = viewController;
+         source = sourceType;
+         this.options = options ?? new StoreCameraMediaOptions();
 
-		public Task<MediaFile> Task
-		{
-			get { return tcs.Task; }
-		}
+         if(viewController != null)
+         {
+            UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
+            observer = NSNotificationCenter.DefaultCenter.AddObserver(
+               UIDevice.OrientationDidChangeNotification,
+               DidRotate );
+         }
+      }
 
-		public override void FinishedPickingMedia (UIImagePickerController picker, NSDictionary info)
-		{
-			MediaFile mediaFile;
-			switch ((NSString)info[UIImagePickerController.MediaType])
-			{
-				case MediaPicker.TypeImage:
-					mediaFile = GetPictureMediaFile (info);
-					break;
+      public UIPopoverController Popover { get; set; }
 
-				case MediaPicker.TypeMovie:
-					mediaFile = GetMovieMediaFile (info);
-					break;
+      public Task<MediaFile> Task
+      {
+         get { return tcs.Task; }
+      }
 
-				default:
-					throw new NotSupportedException();
-			}
+      public UIView View
+      {
+         get { return viewController.View; }
+      }
 
-			Dismiss (picker, () => this.tcs.TrySetResult (mediaFile));
-		}
+      private bool IsCaptured
+      {
+         get { return source == UIImagePickerControllerSourceType.Camera; }
+      }
 
-		public override void Canceled (UIImagePickerController picker)
-		{
-			Dismiss (picker, () => this.tcs.TrySetCanceled());
-		}
+      public override void Canceled( UIImagePickerController picker )
+      {
+         Dismiss( picker, () => tcs.TrySetCanceled() );
+      }
 
-		public void DisplayPopover (bool hideFirst = false)
-		{
-			if (Popover == null)
-				return;
+      public void DisplayPopover( bool hideFirst = false )
+      {
+         if(Popover == null)
+         {
+            return;
+         }
 
-			var swidth = UIScreen.MainScreen.Bounds.Width;
-			var sheight= UIScreen.MainScreen.Bounds.Height;
+         var swidth = UIScreen.MainScreen.Bounds.Width;
+         var sheight = UIScreen.MainScreen.Bounds.Height;
 
-			nfloat width = 400;
-			nfloat height = 300;
+         nfloat width = 400;
+         nfloat height = 300;
 
-			if (this.orientation == null)
-			{
-				if (IsValidInterfaceOrientation (UIDevice.CurrentDevice.Orientation))
-					this.orientation = UIDevice.CurrentDevice.Orientation;
-				else
-					this.orientation = GetDeviceOrientation (this.viewController.InterfaceOrientation);
-			}
+         if(orientation == null)
+         {
+            if(IsValidInterfaceOrientation( UIDevice.CurrentDevice.Orientation ))
+            {
+               orientation = UIDevice.CurrentDevice.Orientation;
+            }
+            else
+            {
+               orientation = GetDeviceOrientation( viewController.InterfaceOrientation );
+            }
+         }
 
-			nfloat x, y;
-			if (this.orientation == UIDeviceOrientation.LandscapeLeft || this.orientation == UIDeviceOrientation.LandscapeRight)
-			{
-				y = (swidth / 2) - (height / 2);
-				x = (sheight / 2) - (width / 2);
-			}
-			else
-			{
-				x = (swidth / 2) - (width / 2);
-				y = (sheight / 2) - (height / 2);
-			}
+         nfloat x, y;
+         if(orientation == UIDeviceOrientation.LandscapeLeft || orientation == UIDeviceOrientation.LandscapeRight)
+         {
+            y = (swidth / 2) - (height / 2);
+            x = (sheight / 2) - (width / 2);
+         }
+         else
+         {
+            x = (swidth / 2) - (width / 2);
+            y = (sheight / 2) - (height / 2);
+         }
 
-			if (hideFirst && Popover.PopoverVisible)
-				Popover.Dismiss (animated: false);
+         if(hideFirst && Popover.PopoverVisible)
+         {
+            Popover.Dismiss( animated: false );
+         }
 
-			Popover.PresentFromRect (new CGRect (x, y, width, height), View, 0, animated: true);
-		}
+         Popover.PresentFromRect( new CGRect( x, y, width, height ), View, 0, animated: true );
+      }
 
-		private UIDeviceOrientation? orientation;
-		private NSObject observer;
-		private readonly UIViewController viewController;
-		private readonly UIImagePickerControllerSourceType source;
-		private readonly TaskCompletionSource<MediaFile> tcs = new TaskCompletionSource<MediaFile>();
-		private readonly StoreCameraMediaOptions options;
+      public override void FinishedPickingMedia( UIImagePickerController picker, NSDictionary info )
+      {
+         MediaFile mediaFile;
+         switch((NSString)info[UIImagePickerController.MediaType])
+         {
+            case MediaPicker.TypeImage:
+               mediaFile = GetPictureMediaFile( info );
+               break;
 
-		private bool IsCaptured
-		{
-			get { return this.source == UIImagePickerControllerSourceType.Camera; }
-		}
-		
-		private void Dismiss (UIImagePickerController picker, NSAction onDismiss)
-		{
-			if (this.viewController == null)
-				onDismiss();
-			else {
-				NSNotificationCenter.DefaultCenter.RemoveObserver (this.observer);
-				UIDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
+            case MediaPicker.TypeMovie:
+               mediaFile = GetMovieMediaFile( info );
+               break;
 
-				this.observer.Dispose();
+            default:
+               throw new NotSupportedException();
+         }
 
-				if (Popover != null) {
-					Popover.Dismiss (animated: true);
-					Popover.Dispose();
-					Popover = null;
+         Dismiss( picker, () => tcs.TrySetResult( mediaFile ) );
+      }
 
-					onDismiss();
-				} else {
-					picker.DismissViewController (true, onDismiss);
-					picker.Dispose();
-				}
-			}
-		}
+      private void DidRotate( NSNotification notice )
+      {
+         UIDevice device = (UIDevice)notice.Object;
+         if(!IsValidInterfaceOrientation( device.Orientation ) || Popover == null)
+         {
+            return;
+         }
+         if(orientation.HasValue && IsSameOrientationKind( orientation.Value, device.Orientation ))
+         {
+            return;
+         }
 
-		private void DidRotate (NSNotification notice)
-		{
-			UIDevice device = (UIDevice)notice.Object;
-			if (!IsValidInterfaceOrientation (device.Orientation) || Popover == null)
-				return;
-			if (this.orientation.HasValue && IsSameOrientationKind (this.orientation.Value, device.Orientation))
-				return;
+         if(UIDevice.CurrentDevice.CheckSystemVersion( 6, 0 ))
+         {
+            if(!GetShouldRotate6( device.Orientation ))
+            {
+               return;
+            }
+         }
+         else if(!GetShouldRotate( device.Orientation ))
+         {
+            return;
+         }
 
-			if (UIDevice.CurrentDevice.CheckSystemVersion (6, 0))
-			{
-				if (!GetShouldRotate6 (device.Orientation))
-					return;
-			}
-			else if (!GetShouldRotate (device.Orientation))
-				return;
+         UIDeviceOrientation? co = orientation;
+         orientation = device.Orientation;
 
-			UIDeviceOrientation? co = this.orientation;
-			this.orientation = device.Orientation;
+         if(co == null)
+         {
+            return;
+         }
 
-			if (co == null)
-				return;
+         DisplayPopover( hideFirst: true );
+      }
 
-			DisplayPopover (hideFirst: true);
-		}
+      private void Dismiss( UIImagePickerController picker, NSAction onDismiss )
+      {
+         if(viewController == null)
+         {
+            onDismiss();
+         }
+         else
+         {
+            NSNotificationCenter.DefaultCenter.RemoveObserver( observer );
+            UIDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
 
-		private bool GetShouldRotate (UIDeviceOrientation orientation)
-		{
-			UIInterfaceOrientation iorientation = UIInterfaceOrientation.Portrait;
-			switch (orientation)
-			{
-				case UIDeviceOrientation.LandscapeLeft:
-					iorientation = UIInterfaceOrientation.LandscapeLeft;
-					break;
-					
-				case UIDeviceOrientation.LandscapeRight:
-					iorientation = UIInterfaceOrientation.LandscapeRight;
-					break;
-					
-				case UIDeviceOrientation.Portrait:
-					iorientation = UIInterfaceOrientation.Portrait;
-					break;
-					
-				case UIDeviceOrientation.PortraitUpsideDown:
-					iorientation = UIInterfaceOrientation.PortraitUpsideDown;
-					break;
-					
-				default: return false;
-			}
+            observer.Dispose();
 
-			return this.viewController.ShouldAutorotateToInterfaceOrientation (iorientation);
-		}
+            if(Popover != null)
+            {
+               Popover.Dismiss( animated: true );
+               Popover.Dispose();
+               Popover = null;
 
-		private bool GetShouldRotate6 (UIDeviceOrientation orientation)
-		{
-			if (!this.viewController.ShouldAutorotate())
-				return false;
+               onDismiss();
+            }
+            else
+            {
+               picker.DismissViewController( true, onDismiss );
+               picker.Dispose();
+            }
+         }
+      }
 
-			UIInterfaceOrientationMask mask = UIInterfaceOrientationMask.Portrait;
-			switch (orientation)
-			{
-				case UIDeviceOrientation.LandscapeLeft:
-					mask = UIInterfaceOrientationMask.LandscapeLeft;
-					break;
-					
-				case UIDeviceOrientation.LandscapeRight:
-					mask = UIInterfaceOrientationMask.LandscapeRight;
-					break;
-					
-				case UIDeviceOrientation.Portrait:
-					mask = UIInterfaceOrientationMask.Portrait;
-					break;
-					
-				case UIDeviceOrientation.PortraitUpsideDown:
-					mask = UIInterfaceOrientationMask.PortraitUpsideDown;
-					break;
-					
-				default: return false; 
-			}
+      private MediaFile GetMovieMediaFile( NSDictionary info )
+      {
+         NSUrl url = (NSUrl)info[UIImagePickerController.MediaURL];
 
-			return this.viewController.GetSupportedInterfaceOrientations().HasFlag (mask);
-		}
+         string path = GetOutputPath(
+            MediaPicker.TypeMovie,
+            options.Directory ?? ((IsCaptured) ? String.Empty : "temp"),
+            options.Name ?? Path.GetFileName( url.Path ) );
 
-		private MediaFile GetPictureMediaFile (NSDictionary info)
-		{
-			var image = (UIImage)info[UIImagePickerController.EditedImage];
-			if (image == null)
-				image = (UIImage)info[UIImagePickerController.OriginalImage];
+         File.Move( url.Path, path );
 
-			string path = GetOutputPath (MediaPicker.TypeImage,
-				options.Directory ?? ((IsCaptured) ? String.Empty : "temp"),
-				options.Name);
+         Action<bool> dispose = null;
+         if(source != UIImagePickerControllerSourceType.Camera)
+         {
+            dispose = d => File.Delete( path );
+         }
 
-			using (FileStream fs = File.OpenWrite (path))
-			using (Stream s = new NSDataStream (image.AsJPEG()))
-			{
-				s.CopyTo (fs);
-				fs.Flush();
-			}
+         return new MediaFile( path, () => File.OpenRead( path ), dispose );
+      }
 
-			Action<bool> dispose = null;
-			if (this.source != UIImagePickerControllerSourceType.Camera)
-				dispose = d => File.Delete (path);
+      private MediaFile GetPictureMediaFile( NSDictionary info )
+      {
+         var image = (UIImage)info[UIImagePickerController.EditedImage];
+         if(image == null)
+         {
+            image = (UIImage)info[UIImagePickerController.OriginalImage];
+         }
 
-			return new MediaFile (path, () => File.OpenRead (path), dispose);
-		}
+         string path = GetOutputPath(
+            MediaPicker.TypeImage,
+            options.Directory ?? ((IsCaptured) ? String.Empty : "temp"),
+            options.Name );
 
-		private MediaFile GetMovieMediaFile (NSDictionary info)
-		{
-			NSUrl url = (NSUrl)info[UIImagePickerController.MediaURL];
+         using(FileStream fs = File.OpenWrite( path ))
+         using(Stream s = new NSDataStream( image.AsJPEG() ))
+         {
+            s.CopyTo( fs );
+            fs.Flush();
+         }
 
-			string path = GetOutputPath (MediaPicker.TypeMovie,
-				options.Directory ?? ((IsCaptured) ? String.Empty : "temp"),
-				this.options.Name ?? Path.GetFileName (url.Path));
+         Action<bool> dispose = null;
+         if(source != UIImagePickerControllerSourceType.Camera)
+         {
+            dispose = d => File.Delete( path );
+         }
 
-			File.Move (url.Path, path);
+         return new MediaFile( path, () => File.OpenRead( path ), dispose );
+      }
 
-			Action<bool> dispose = null;
-			if (this.source != UIImagePickerControllerSourceType.Camera)
-				dispose = d => File.Delete (path);
+      private bool GetShouldRotate( UIDeviceOrientation orientation )
+      {
+         UIInterfaceOrientation iorientation = UIInterfaceOrientation.Portrait;
+         switch(orientation)
+         {
+            case UIDeviceOrientation.LandscapeLeft:
+               iorientation = UIInterfaceOrientation.LandscapeLeft;
+               break;
 
-			return new MediaFile (path, () => File.OpenRead (path), dispose);
-		}
-		
-		private static string GetUniquePath (string type, string path, string name)
-		{
-			bool isPhoto = (type == MediaPicker.TypeImage);
-			string ext = Path.GetExtension (name);
-			if (ext == String.Empty)
-				ext = ((isPhoto) ? ".jpg" : ".mp4");
+            case UIDeviceOrientation.LandscapeRight:
+               iorientation = UIInterfaceOrientation.LandscapeRight;
+               break;
 
-			name = Path.GetFileNameWithoutExtension (name);
+            case UIDeviceOrientation.Portrait:
+               iorientation = UIInterfaceOrientation.Portrait;
+               break;
 
-			string nname = name + ext;
-			int i = 1;
-			while (File.Exists (Path.Combine (path, nname)))
-				nname = name + "_" + (i++) + ext;
+            case UIDeviceOrientation.PortraitUpsideDown:
+               iorientation = UIInterfaceOrientation.PortraitUpsideDown;
+               break;
 
-			return Path.Combine (path, nname);
-		}
+            default:
+               return false;
+         }
 
-		private static string GetOutputPath (string type, string path, string name)
-		{
-			path = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Personal), path);
-			Directory.CreateDirectory (path);
+         return viewController.ShouldAutorotateToInterfaceOrientation( iorientation );
+      }
 
-			if (String.IsNullOrWhiteSpace (name))
-			{
-				string timestamp = DateTime.Now.ToString ("yyyMMdd_HHmmss");
-				if (type == MediaPicker.TypeImage)
-					name = "IMG_" + timestamp + ".jpg";
-				else
-					name = "VID_" + timestamp + ".mp4";
-			}
+      private bool GetShouldRotate6( UIDeviceOrientation orientation )
+      {
+         if(!viewController.ShouldAutorotate())
+         {
+            return false;
+         }
 
-			return Path.Combine (path, GetUniquePath (type, path, name));
-		}
-		
-		private static bool IsValidInterfaceOrientation (UIDeviceOrientation self)
-		{
-			return (self != UIDeviceOrientation.FaceUp && self != UIDeviceOrientation.FaceDown && self != UIDeviceOrientation.Unknown);
-		}
-		
-		private static bool IsSameOrientationKind (UIDeviceOrientation o1, UIDeviceOrientation o2)
-		{
-			if (o1 == UIDeviceOrientation.FaceDown || o1 == UIDeviceOrientation.FaceUp)
-				return (o2 == UIDeviceOrientation.FaceDown || o2 == UIDeviceOrientation.FaceUp);
-			if (o1 == UIDeviceOrientation.LandscapeLeft || o1 == UIDeviceOrientation.LandscapeRight)
-				return (o2 == UIDeviceOrientation.LandscapeLeft || o2 == UIDeviceOrientation.LandscapeRight);
-			if (o1 == UIDeviceOrientation.Portrait || o1 == UIDeviceOrientation.PortraitUpsideDown)
-				return (o2 == UIDeviceOrientation.Portrait || o2 == UIDeviceOrientation.PortraitUpsideDown);
-			
-			return false;
-		}
-		
-		private static UIDeviceOrientation GetDeviceOrientation (UIInterfaceOrientation self)
-		{
-			switch (self)
-			{
-				case UIInterfaceOrientation.LandscapeLeft:
-					return UIDeviceOrientation.LandscapeLeft;
-				case UIInterfaceOrientation.LandscapeRight:
-					return UIDeviceOrientation.LandscapeRight;
-				case UIInterfaceOrientation.Portrait:
-					return UIDeviceOrientation.Portrait;
-				case UIInterfaceOrientation.PortraitUpsideDown:
-					return UIDeviceOrientation.PortraitUpsideDown;
-				default:
-					throw new InvalidOperationException();
-			}
-		}
-	}
+         UIInterfaceOrientationMask mask = UIInterfaceOrientationMask.Portrait;
+         switch(orientation)
+         {
+            case UIDeviceOrientation.LandscapeLeft:
+               mask = UIInterfaceOrientationMask.LandscapeLeft;
+               break;
+
+            case UIDeviceOrientation.LandscapeRight:
+               mask = UIInterfaceOrientationMask.LandscapeRight;
+               break;
+
+            case UIDeviceOrientation.Portrait:
+               mask = UIInterfaceOrientationMask.Portrait;
+               break;
+
+            case UIDeviceOrientation.PortraitUpsideDown:
+               mask = UIInterfaceOrientationMask.PortraitUpsideDown;
+               break;
+
+            default:
+               return false;
+         }
+
+         return viewController.GetSupportedInterfaceOrientations().HasFlag( mask );
+      }
+
+      private static UIDeviceOrientation GetDeviceOrientation( UIInterfaceOrientation self )
+      {
+         switch(self)
+         {
+            case UIInterfaceOrientation.LandscapeLeft:
+               return UIDeviceOrientation.LandscapeLeft;
+            case UIInterfaceOrientation.LandscapeRight:
+               return UIDeviceOrientation.LandscapeRight;
+            case UIInterfaceOrientation.Portrait:
+               return UIDeviceOrientation.Portrait;
+            case UIInterfaceOrientation.PortraitUpsideDown:
+               return UIDeviceOrientation.PortraitUpsideDown;
+            default:
+               throw new InvalidOperationException();
+         }
+      }
+
+      private static string GetOutputPath( string type, string path, string name )
+      {
+         path = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.Personal ), path );
+         Directory.CreateDirectory( path );
+
+         if(String.IsNullOrWhiteSpace( name ))
+         {
+            string timestamp = DateTime.Now.ToString( "yyyMMdd_HHmmss" );
+            if(type == MediaPicker.TypeImage)
+            {
+               name = "IMG_" + timestamp + ".jpg";
+            }
+            else
+            {
+               name = "VID_" + timestamp + ".mp4";
+            }
+         }
+
+         return Path.Combine( path, GetUniquePath( type, path, name ) );
+      }
+
+      private static string GetUniquePath( string type, string path, string name )
+      {
+         bool isPhoto = (type == MediaPicker.TypeImage);
+         string ext = Path.GetExtension( name );
+         if(ext == String.Empty)
+         {
+            ext = ((isPhoto) ? ".jpg" : ".mp4");
+         }
+
+         name = Path.GetFileNameWithoutExtension( name );
+
+         string nname = name + ext;
+         int i = 1;
+         while(File.Exists( Path.Combine( path, nname ) ))
+         {
+            nname = name + "_" + (i++) + ext;
+         }
+
+         return Path.Combine( path, nname );
+      }
+
+      private static bool IsSameOrientationKind( UIDeviceOrientation o1, UIDeviceOrientation o2 )
+      {
+         if(o1 == UIDeviceOrientation.FaceDown || o1 == UIDeviceOrientation.FaceUp)
+         {
+            return (o2 == UIDeviceOrientation.FaceDown || o2 == UIDeviceOrientation.FaceUp);
+         }
+         if(o1 == UIDeviceOrientation.LandscapeLeft || o1 == UIDeviceOrientation.LandscapeRight)
+         {
+            return (o2 == UIDeviceOrientation.LandscapeLeft || o2 == UIDeviceOrientation.LandscapeRight);
+         }
+         if(o1 == UIDeviceOrientation.Portrait || o1 == UIDeviceOrientation.PortraitUpsideDown)
+         {
+            return (o2 == UIDeviceOrientation.Portrait || o2 == UIDeviceOrientation.PortraitUpsideDown);
+         }
+
+         return false;
+      }
+
+      private static bool IsValidInterfaceOrientation( UIDeviceOrientation self )
+      {
+         return (self != UIDeviceOrientation.FaceUp && self != UIDeviceOrientation.FaceDown &&
+                 self != UIDeviceOrientation.Unknown);
+      }
+   }
 }

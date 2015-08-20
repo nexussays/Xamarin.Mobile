@@ -24,173 +24,144 @@ using Android.Content;
 using Android.Content.Res;
 using Android.Database;
 using Android.Provider;
+using Java.Lang;
+using String = System.String;
+using Uri = Android.Net.Uri;
 
 namespace Xamarin.Contacts
 {
-	public sealed class AddressBook
-		: IQueryable<Contact>
-	{
-		public AddressBook (Context context)
-		{
-			if (context == null)
-				throw new ArgumentNullException ("context");
+   public sealed class AddressBook : IQueryable<Contact>
+   {
+      private readonly ContactQueryProvider contactsProvider;
+      private readonly ContentResolver content;
+      private readonly Resources resources;
 
-			this.content = context.ContentResolver;
-			this.resources = context.Resources;
-			this.contactsProvider = new ContactQueryProvider (context.ContentResolver, context.Resources);
-		}
+      public AddressBook( Context context )
+      {
+         if(context == null)
+         {
+            throw new ArgumentNullException( "context" );
+         }
 
-		public bool IsReadOnly
-		{
-			get { return true; }
-		}
+         content = context.ContentResolver;
+         resources = context.Resources;
+         contactsProvider = new ContactQueryProvider( context.ContentResolver, context.Resources );
+      }
 
-		public bool SingleContactsSupported
-		{
-			get { return true; }
-		}
+      public bool AggregateContactsSupported
+      {
+         get { return true; }
+      }
 
-		public bool AggregateContactsSupported
-		{
-			get { return true; }
-		}
+      public bool IsReadOnly
+      {
+         get { return true; }
+      }
 
-		public bool PreferContactAggregation
-		{
-			get { return !this.contactsProvider.UseRawContacts; }
-			set { this.contactsProvider.UseRawContacts = !value; }
-		}
+      public bool LoadSupported
+      {
+         get { return true; }
+      }
 
-		public bool LoadSupported
-		{
-			get { return true; }
-		}
+      public bool PreferContactAggregation
+      {
+         get { return !contactsProvider.UseRawContacts; }
+         set { contactsProvider.UseRawContacts = !value; }
+      }
 
-		public Task<bool> RequestPermission()
-		{
-			return Task.Factory.StartNew (() =>
-			{
-				try
-				{
-					ICursor cursor = this.content.Query (ContactsContract.Data.ContentUri, null, null, null, null);
-					cursor.Dispose();
+      public bool SingleContactsSupported
+      {
+         get { return true; }
+      }
 
-					return true;
-				}
-				catch (Java.Lang.SecurityException)
-				{
-					return false;
-				}
-			});
-		}
+      Type IQueryable.ElementType
+      {
+         get { return typeof(Contact); }
+      }
 
-		public IEnumerator<Contact> GetEnumerator()
-		{
-			return ContactHelper.GetContacts (!PreferContactAggregation, this.content, this.resources).GetEnumerator();
-		}
+      Expression IQueryable.Expression
+      {
+         get { return Expression.Constant( this ); }
+      }
 
-		/// <summary>
-		/// Attempts to load a contact for the specified <paramref name="id"/>.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns>The <see cref="Contact"/> if found, <c>null</c> otherwise.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="id"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="id"/> is empty.</exception>
-		public Contact Load (string id)
-		{
-			if (id == null)
-				throw new ArgumentNullException ("id");
-			if (id.Trim() == String.Empty)
-				throw new ArgumentException ("Invalid ID", "id");
+      IQueryProvider IQueryable.Provider
+      {
+         get { return contactsProvider; }
+      }
 
-			Android.Net.Uri curi; string column;
-			if (PreferContactAggregation)
-			{
-				curi = ContactsContract.Contacts.ContentUri;
-				column = ContactsContract.ContactsColumns.LookupKey;
-			}
-			else
-			{
-				curi = ContactsContract.RawContacts.ContentUri;
-				column = ContactsContract.RawContactsColumns.ContactId;
-			}
+      public IEnumerator<Contact> GetEnumerator()
+      {
+         return ContactHelper.GetContacts( !PreferContactAggregation, content, resources ).GetEnumerator();
+      }
 
-			ICursor c = null;
-			try
-			{
-				c = this.content.Query (curi, null, column + " = ?", new[] { id }, null);
-				return (c.MoveToNext() ? ContactHelper.GetContact (!PreferContactAggregation, this.content, this.resources, c) : null);
-			}
-			finally
-			{
-				if (c != null)
-					c.Deactivate();
-			}
-		}
+      /// <summary>
+      /// Attempts to load a contact for the specified <paramref name="id" />.
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns>The <see cref="Contact" /> if found, <c>null</c> otherwise.</returns>
+      /// <exception cref="ArgumentNullException"><paramref name="id" /> is <c>null</c>.</exception>
+      /// <exception cref="ArgumentException"><paramref name="id" /> is empty.</exception>
+      public Contact Load( string id )
+      {
+         if(id == null)
+         {
+            throw new ArgumentNullException( "id" );
+         }
+         if(id.Trim() == String.Empty)
+         {
+            throw new ArgumentException( "Invalid ID", "id" );
+         }
 
-		//public Contact SaveNew (Contact contact)
-		//{
-		//    if (contact == null)
-		//        throw new ArgumentNullException ("contact");
-		//    if (contact.Id != null)
-		//        throw new ArgumentException ("Contact is not new", "contact");
+         Uri curi;
+         string column;
+         if(PreferContactAggregation)
+         {
+            curi = ContactsContract.Contacts.ContentUri;
+            column = ContactsContract.ContactsColumns.LookupKey;
+         }
+         else
+         {
+            curi = ContactsContract.RawContacts.ContentUri;
+            column = ContactsContract.RawContactsColumns.ContactId;
+         }
 
-		//    throw new NotImplementedException();
-		//}
+         ICursor c = null;
+         try
+         {
+            c = content.Query( curi, null, column + " = ?", new[] {id}, null );
+            return (c.MoveToNext() ? ContactHelper.GetContact( !PreferContactAggregation, content, resources, c ) : null);
+         }
+         finally
+         {
+            if(c != null)
+            {
+               c.Deactivate();
+            }
+         }
+      }
 
-		//public Contact SaveExisting (Contact contact)
-		//{
-		//    if (contact == null)
-		//        throw new ArgumentNullException ("contact");
-		//    if (String.IsNullOrWhiteSpace (contact.Id))
-		//        throw new ArgumentException ("Contact is not existing");
+      public Task<bool> RequestPermission()
+      {
+         return Task.Factory.StartNew(
+            () =>
+            {
+               try
+               {
+                  ICursor cursor = content.Query( ContactsContract.Data.ContentUri, null, null, null, null );
+                  cursor.Dispose();
 
-		//    throw new NotImplementedException();
+                  return true;
+               }
+               catch(SecurityException)
+               {
+                  return false;
+               }
+            } );
+      }
 
-		//    return Load (contact.Id);
-		//}
-
-		//public Contact Save (Contact contact)
-		//{
-		//    if (contact == null)
-		//        throw new ArgumentNullException ("contact");
-
-		//    return (String.IsNullOrWhiteSpace (contact.Id) ? SaveNew (contact) : SaveExisting (contact));
-		//}
-
-		//public void Delete (Contact contact)
-		//{
-		//    if (contact == null)
-		//        throw new ArgumentNullException ("contact");
-		//    if (!String.IsNullOrWhiteSpace (contact.Id))
-		//        throw new ArgumentException ("Contact is not a persisted instance", "contact");
-
-		//    // TODO: Does this cascade?
-		//    this.content.Delete (ContactsContract.RawContacts.ContentUri, ContactsContract.RawContactsColumns.ContactId + " = ?", new[] { contact.Id });
-		//}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		Type IQueryable.ElementType
-		{
-			get { return typeof (Contact); }
-		}
-
-		Expression IQueryable.Expression
-		{
-			get { return Expression.Constant (this); }
-		}
-
-		IQueryProvider IQueryable.Provider
-		{
-			get { return this.contactsProvider; }
-		}
-
-		private readonly ContactQueryProvider contactsProvider;
-		private readonly ContentResolver content;
-		private readonly Resources resources;
-	}
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+         return GetEnumerator();
+      }
+   }
 }

@@ -17,185 +17,165 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Database;
 using Android.Graphics;
-using Android.OS;
 using Android.Provider;
 using Xamarin.Media;
 
 namespace Xamarin.Contacts
 {
-	public class Contact
-	{
-		public Contact()
-		{
-		}
+   public class Contact
+   {
+      internal List<Address> addresses = new List<Address>();
+      internal List<Email> emails = new List<Email>();
+      internal List<InstantMessagingAccount> instantMessagingAccounts = new List<InstantMessagingAccount>();
+      internal List<Note> notes = new List<Note>();
+      internal List<Organization> organizations = new List<Organization>();
+      internal List<Phone> phones = new List<Phone>();
+      internal List<Relationship> relationships = new List<Relationship>();
+      internal List<Website> websites = new List<Website>();
+      private readonly ContentResolver content;
 
-		internal Contact (string id, bool isAggregate, ContentResolver content)
-		{
-			this.content = content;
-			IsAggregate = isAggregate;
-			Id = id;
-		}
+      public Contact()
+      {
+      }
 
-		public string Id
-		{
-			get;
-			private set;
-		}
+      internal Contact( string id, bool isAggregate, ContentResolver content )
+      {
+         this.content = content;
+         IsAggregate = isAggregate;
+         Id = id;
+      }
 
-		public bool IsAggregate
-		{
-			get;
-			private set;
-		}
+      public IEnumerable<Address> Addresses
+      {
+         get { return addresses; }
+         set { addresses = new List<Address>( value ); }
+      }
 
-		public string DisplayName
-		{
-			get;
-			set;
-		}
+      public string DisplayName { get; set; }
 
-		public string Prefix
-		{
-			get;
-			set;
-		}
+      public IEnumerable<Email> Emails
+      {
+         get { return emails; }
+         set { emails = new List<Email>( value ); }
+      }
 
-		public string FirstName
-		{
-			get;
-			set;
-		}
+      public string FirstName { get; set; }
 
-		public string MiddleName
-		{
-			get;
-			set;
-		}
+      public string Id { get; private set; }
 
-		public string LastName
-		{
-			get;
-			set;
-		}
+      public IEnumerable<InstantMessagingAccount> InstantMessagingAccounts
+      {
+         get { return instantMessagingAccounts; }
+         set { instantMessagingAccounts = new List<InstantMessagingAccount>( value ); }
+      }
 
-		public string Nickname
-		{
-			get;
-			set;
-		}
+      public bool IsAggregate { get; private set; }
 
-		public string Suffix
-		{
-			get;
-			set;
-		}
+      public string LastName { get; set; }
 
-		internal List<Relationship> relationships = new List<Relationship>();
-		public IEnumerable<Relationship> Relationships
-		{
-			get { return this.relationships; }
-			set { this.relationships = new List<Relationship> (value); }
-		}
+      public string MiddleName { get; set; }
 
-		internal List<Address> addresses = new List<Address>();
-		public IEnumerable<Address> Addresses
-		{
-			get { return this.addresses; }
-			set { this.addresses = new List<Address> (value); }
-		}
+      public string Nickname { get; set; }
 
-		internal List<InstantMessagingAccount> instantMessagingAccounts = new List<InstantMessagingAccount>();
-		public IEnumerable<InstantMessagingAccount> InstantMessagingAccounts
-		{
-			get { return this.instantMessagingAccounts; }
-			set { this.instantMessagingAccounts = new List<InstantMessagingAccount> (value); }
-		}
+      public IEnumerable<Note> Notes
+      {
+         get { return notes; }
+         set { notes = new List<Note>( value ); }
+      }
 
-		internal List<Website> websites = new List<Website>();
-		public IEnumerable<Website> Websites
-		{
-			get { return this.websites; }
-			set { this.websites = new List<Website> (value); }
-		}
+      public IEnumerable<Organization> Organizations
+      {
+         get { return organizations; }
+         set { organizations = new List<Organization>( value ); }
+      }
 
-		internal List<Organization> organizations = new List<Organization>();
-		public IEnumerable<Organization> Organizations
-		{
-			get { return this.organizations; }
-			set { this.organizations = new List<Organization> (value); }
-		}
+      public IEnumerable<Phone> Phones
+      {
+         get { return phones; }
+         set { phones = new List<Phone>( value ); }
+      }
 
-		internal List<Note> notes = new List<Note>();
-		public IEnumerable<Note> Notes
-		{
-			get { return this.notes; }
-			set { this.notes = new List<Note> (value); }
-		}
+      public string Prefix { get; set; }
 
-		internal List<Email> emails = new List<Email>();
-		public IEnumerable<Email> Emails
-		{
-			get { return this.emails; }
-			set { this.emails = new List<Email> (value); }
-		}
+      public IEnumerable<Relationship> Relationships
+      {
+         get { return relationships; }
+         set { relationships = new List<Relationship>( value ); }
+      }
 
-		internal List<Phone> phones = new List<Phone>();
-		public IEnumerable<Phone> Phones
-		{
-			get { return this.phones; }
-			set { this.phones = new List<Phone> (value); }
-		}
+      public string Suffix { get; set; }
 
-		public Bitmap GetThumbnail()
-		{
-			byte[] data = GetThumbnailBytes();
-			return (data == null) ? null : BitmapFactory.DecodeByteArray (data, 0, data.Length);
-		}
+      public IEnumerable<Website> Websites
+      {
+         get { return websites; }
+         set { websites = new List<Website>( value ); }
+      }
 
-		public Task<MediaFile> SaveThumbnailAsync (string path)
-		{
-			if (path == null)
-				throw new ArgumentNullException ("path");
+      public Bitmap GetThumbnail()
+      {
+         byte[] data = GetThumbnailBytes();
+         return (data == null) ? null : BitmapFactory.DecodeByteArray( data, 0, data.Length );
+      }
 
-			return Task.Factory.StartNew (() => {
-				byte[] bytes = GetThumbnailBytes();
-				if (bytes == null)
-					return null;
-				
-				File.WriteAllBytes (path, bytes);
-				return new MediaFile (path, deletePathOnDispose: false);
-			});
-		}
+      public Task<MediaFile> SaveThumbnailAsync( string path )
+      {
+         if(path == null)
+         {
+            throw new ArgumentNullException( "path" );
+         }
 
-		byte[] GetThumbnailBytes()
-		{
-			string lookupColumn = (IsAggregate)
-			                      	? ContactsContract.ContactsColumns.LookupKey
-			                      	: ContactsContract.RawContactsColumns.ContactId;
+         return Task.Factory.StartNew(
+            () =>
+            {
+               byte[] bytes = GetThumbnailBytes();
+               if(bytes == null)
+               {
+                  return null;
+               }
 
-			ICursor c = null;
-			try {
-				c = this.content.Query (ContactsContract.Data.ContentUri, new[] { ContactsContract.CommonDataKinds.Photo.PhotoColumnId, ContactsContract.DataColumns.Mimetype },
-					lookupColumn + "=? AND " + ContactsContract.DataColumns.Mimetype + "=?", new[] { Id, ContactsContract.CommonDataKinds.Photo.ContentItemType }, null);
+               File.WriteAllBytes( path, bytes );
+               return new MediaFile( path, deletePathOnDispose: false );
+            } );
+      }
 
-				while (c.MoveToNext()) {
-					byte[] tdata = c.GetBlob (c.GetColumnIndex (ContactsContract.CommonDataKinds.Photo.PhotoColumnId));
-					if (tdata != null)
-						return tdata;
-				}
-			} finally {
-				if (c != null)
-					c.Close();
-			}
+      private byte[] GetThumbnailBytes()
+      {
+         string lookupColumn = (IsAggregate)
+            ? ContactsContract.ContactsColumns.LookupKey
+            : ContactsContract.RawContactsColumns.ContactId;
 
-			return null;
-		}
+         ICursor c = null;
+         try
+         {
+            c = content.Query(
+               ContactsContract.Data.ContentUri,
+               new[] {ContactsContract.CommonDataKinds.Photo.PhotoColumnId, ContactsContract.DataColumns.Mimetype},
+               lookupColumn + "=? AND " + ContactsContract.DataColumns.Mimetype + "=?",
+               new[] {Id, ContactsContract.CommonDataKinds.Photo.ContentItemType},
+               null );
 
-		private readonly ContentResolver content;
-	}
+            while(c.MoveToNext())
+            {
+               byte[] tdata = c.GetBlob( c.GetColumnIndex( ContactsContract.CommonDataKinds.Photo.PhotoColumnId ) );
+               if(tdata != null)
+               {
+                  return tdata;
+               }
+            }
+         }
+         finally
+         {
+            if(c != null)
+            {
+               c.Close();
+            }
+         }
+
+         return null;
+      }
+   }
 }

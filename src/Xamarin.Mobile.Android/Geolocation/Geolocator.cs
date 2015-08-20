@@ -15,47 +15,64 @@
 //
 
 using System;
-using System.Threading.Tasks;
-using Android.Locations;
-using System.Threading;
-using System.Collections.Generic;
-using Android.App;
-using Android.OS;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Android.Content;
+using Android.Locations;
+using Android.OS;
+using Java.Lang;
 
 namespace Xamarin.Geolocation
 {
-	public class Geolocator
-	{
-		public Geolocator (Context context)
-		{
-			if (context == null)
-				throw new ArgumentNullException ("context");
+   public class Geolocator
+   {
+      private static readonly DateTime Epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
+      private readonly LocationManager manager;
+      private readonly object positionSync = new object();
+      private readonly string[] providers;
+      private string headingProvider;
+      private Position lastPosition;
+      private GeolocationContinuousListener listener;
 
-			this.manager = (LocationManager)context.GetSystemService (Context.LocationService);
-			this.providers = manager.GetProviders (enabledOnly: false).Where (s => s != LocationManager.PassiveProvider).ToArray();
-		}
+      public Geolocator( Context context )
+      {
+         if(context == null)
+         {
+            throw new ArgumentNullException( "context" );
+         }
 
-		public event EventHandler<PositionErrorEventArgs> PositionError;
-		public event EventHandler<PositionEventArgs> PositionChanged;
+         manager = (LocationManager)context.GetSystemService( Context.LocationService );
+         providers =
+            manager.GetProviders( enabledOnly: false ).Where( s => s != LocationManager.PassiveProvider ).ToArray();
+      }
 
-		public bool IsListening
-		{
-			get { return this.listener != null; }
-		}
+      public event EventHandler<PositionEventArgs> PositionChanged;
 
-		public double DesiredAccuracy
-		{
-			get;
-			set;
-		}
+      public event EventHandler<PositionErrorEventArgs> PositionError;
 
-		public bool SupportsHeading
-		{
-			get
-			{
-				return false;
+      public double DesiredAccuracy { get; set; }
+
+      public bool IsGeolocationAvailable
+      {
+         get { return providers.Length > 0; }
+      }
+
+      public bool IsGeolocationEnabled
+      {
+         get { return providers.Any( manager.IsProviderEnabled ); }
+      }
+
+      public bool IsListening
+      {
+         get { return listener != null; }
+      }
+
+      public bool SupportsHeading
+      {
+         get
+         {
+            return false;
 //				if (this.headingProvider == null || !this.manager.IsProviderEnabled (this.headingProvider))
 //				{
 //					Criteria c = new Criteria { BearingRequired = true };
@@ -76,205 +93,218 @@ namespace Xamarin.Geolocation
 //				}
 //				else
 //					return true;
-			}
-		}
+         }
+      }
 
-		public bool IsGeolocationAvailable
-		{
-			get { return this.providers.Length > 0; }
-		}
-		
-		public bool IsGeolocationEnabled
-		{
-			get { return this.providers.Any (this.manager.IsProviderEnabled); }
-		}
+      public Task<Position> GetPositionAsync( CancellationToken cancelToken )
+      {
+         return GetPositionAsync( cancelToken, false );
+      }
 
-		public Task<Position> GetPositionAsync (CancellationToken cancelToken)
-		{
-			return GetPositionAsync (cancelToken, false);
-		}
+      public Task<Position> GetPositionAsync( CancellationToken cancelToken, bool includeHeading )
+      {
+         return GetPositionAsync( Timeout.Infinite, cancelToken );
+      }
 
-		public Task<Position> GetPositionAsync (CancellationToken cancelToken, bool includeHeading)
-		{
-			return GetPositionAsync (Timeout.Infinite, cancelToken);
-		}
+      public Task<Position> GetPositionAsync( int timeout )
+      {
+         return GetPositionAsync( timeout, false );
+      }
 
-		public Task<Position> GetPositionAsync (int timeout)
-		{
-			return GetPositionAsync (timeout, false);
-		}
+      public Task<Position> GetPositionAsync( int timeout, bool includeHeading )
+      {
+         return GetPositionAsync( timeout, CancellationToken.None );
+      }
 
-		public Task<Position> GetPositionAsync (int timeout, bool includeHeading)
-		{
-			return GetPositionAsync (timeout, CancellationToken.None);
-		}
-		
-		public Task<Position> GetPositionAsync (int timeout, CancellationToken cancelToken)
-		{
-			return GetPositionAsync (timeout, cancelToken, false);
-		}
+      public Task<Position> GetPositionAsync( int timeout, CancellationToken cancelToken )
+      {
+         return GetPositionAsync( timeout, cancelToken, false );
+      }
 
-		public Task<Position> GetPositionAsync (int timeout, CancellationToken cancelToken, bool includeHeading)
-		{
-			if (timeout <= 0 && timeout != Timeout.Infinite)
-				throw new ArgumentOutOfRangeException ("timeout", "timeout must be greater than or equal to 0");
-			
-			var tcs = new TaskCompletionSource<Position>();
+      public Task<Position> GetPositionAsync( int timeout, CancellationToken cancelToken, bool includeHeading )
+      {
+         if(timeout <= 0 && timeout != Timeout.Infinite)
+         {
+            throw new ArgumentOutOfRangeException( "timeout", "timeout must be greater than or equal to 0" );
+         }
 
-			if (!IsListening)
-			{
-				GeolocationSingleListener singleListener = null;
-				singleListener = new GeolocationSingleListener ((float)DesiredAccuracy, timeout, this.providers.Where (this.manager.IsProviderEnabled),
-					finishedCallback: () =>
-				{
-					for (int i = 0; i < this.providers.Length; ++i)
-						this.manager.RemoveUpdates (singleListener);
-				});
-				
-				if (cancelToken != CancellationToken.None)
-				{
-					cancelToken.Register (() =>
-					{
-						singleListener.Cancel();
-						
-						for (int i = 0; i < this.providers.Length; ++i)
-							this.manager.RemoveUpdates (singleListener);
-					}, true);
-				}
-				
-				try
-				{
-					Looper looper = Looper.MyLooper() ?? Looper.MainLooper;
+         var tcs = new TaskCompletionSource<Position>();
 
-					int enabled = 0;
-					for (int i = 0; i < this.providers.Length; ++i)
-					{
-						if (this.manager.IsProviderEnabled (this.providers[i]))
-							enabled++;
-						
-						this.manager.RequestLocationUpdates (this.providers[i], 0, 0, singleListener, looper);
-					}
-					
-					if (enabled == 0)
-					{
-						for (int i = 0; i < this.providers.Length; ++i)
-							this.manager.RemoveUpdates (singleListener);
-						
-						tcs.SetException (new GeolocationException (GeolocationError.PositionUnavailable));
-						return tcs.Task;
-					}
-				}
-				catch (Java.Lang.SecurityException ex)
-				{
-					tcs.SetException (new GeolocationException (GeolocationError.Unauthorized, ex));
-					return tcs.Task;
-				}
+         if(!IsListening)
+         {
+            GeolocationSingleListener singleListener = null;
+            singleListener = new GeolocationSingleListener(
+               (float)DesiredAccuracy,
+               timeout,
+               providers.Where( manager.IsProviderEnabled ),
+               finishedCallback: () =>
+               {
+                  for(int i = 0; i < providers.Length; ++i)
+                  {
+                     manager.RemoveUpdates( singleListener );
+                  }
+               } );
 
-				return singleListener.Task;
-			}
+            if(cancelToken != CancellationToken.None)
+            {
+               cancelToken.Register(
+                  () =>
+                  {
+                     singleListener.Cancel();
 
-			// If we're already listening, just use the current listener
-			lock (this.positionSync)
-			{
-				if (this.lastPosition == null)
-				{
-					if (cancelToken != CancellationToken.None)
-					{
-						cancelToken.Register (() => tcs.TrySetCanceled());
-					}
+                     for(int i = 0; i < providers.Length; ++i)
+                     {
+                        manager.RemoveUpdates( singleListener );
+                     }
+                  },
+                  true );
+            }
 
-					EventHandler<PositionEventArgs> gotPosition = null;
-					gotPosition = (s, e) =>
-					{
-						tcs.TrySetResult (e.Position);
-						PositionChanged -= gotPosition;
-					};
+            try
+            {
+               Looper looper = Looper.MyLooper() ?? Looper.MainLooper;
 
-					PositionChanged += gotPosition;
-				}
-				else
-				{
-					tcs.SetResult (this.lastPosition);
-				}
-			}
+               int enabled = 0;
+               for(int i = 0; i < providers.Length; ++i)
+               {
+                  if(manager.IsProviderEnabled( providers[i] ))
+                  {
+                     enabled++;
+                  }
 
-			return tcs.Task;
-		}
+                  manager.RequestLocationUpdates( providers[i], 0, 0, singleListener, looper );
+               }
 
-		public void StartListening (int minTime, double minDistance)
-		{
-			StartListening (minTime, minDistance, false);
-		}
+               if(enabled == 0)
+               {
+                  for(int i = 0; i < providers.Length; ++i)
+                  {
+                     manager.RemoveUpdates( singleListener );
+                  }
 
-		public void StartListening (int minTime, double minDistance, bool includeHeading)
-		{
-			if (minTime < 0)
-				throw new ArgumentOutOfRangeException ("minTime");
-			if (minDistance < 0)
-				throw new ArgumentOutOfRangeException ("minDistance");
-			if (IsListening)
-				throw new InvalidOperationException ("This Geolocator is already listening");
+                  tcs.SetException( new GeolocationException( GeolocationError.PositionUnavailable ) );
+                  return tcs.Task;
+               }
+            }
+            catch(SecurityException ex)
+            {
+               tcs.SetException( new GeolocationException( GeolocationError.Unauthorized, ex ) );
+               return tcs.Task;
+            }
 
-			this.listener = new GeolocationContinuousListener (this.manager, TimeSpan.FromMilliseconds (minTime), this.providers);
-			this.listener.PositionChanged += OnListenerPositionChanged;
-			this.listener.PositionError += OnListenerPositionError;
+            return singleListener.Task;
+         }
 
-			Looper looper = Looper.MyLooper() ?? Looper.MainLooper;
-			for (int i = 0; i < this.providers.Length; ++i)
-				this.manager.RequestLocationUpdates (providers[i], minTime, (float)minDistance, listener, looper);
-		}
+         // If we're already listening, just use the current listener
+         lock(positionSync)
+         {
+            if(lastPosition == null)
+            {
+               if(cancelToken != CancellationToken.None)
+               {
+                  cancelToken.Register( () => tcs.TrySetCanceled() );
+               }
 
-		public void StopListening()
-		{
-			if (this.listener == null)
-				return;
+               EventHandler<PositionEventArgs> gotPosition = null;
+               gotPosition = ( s, e ) =>
+               {
+                  tcs.TrySetResult( e.Position );
+                  PositionChanged -= gotPosition;
+               };
 
-			this.listener.PositionChanged -= OnListenerPositionChanged;
-			this.listener.PositionError -= OnListenerPositionError;
+               PositionChanged += gotPosition;
+            }
+            else
+            {
+               tcs.SetResult( lastPosition );
+            }
+         }
 
-			for (int i = 0; i < this.providers.Length; ++i)
-				this.manager.RemoveUpdates (this.listener);
+         return tcs.Task;
+      }
 
-			this.listener = null;
-		}
+      public void StartListening( int minTime, double minDistance )
+      {
+         StartListening( minTime, minDistance, false );
+      }
 
-		private readonly string[] providers;
-		private readonly LocationManager manager;
-		private string headingProvider;
+      public void StartListening( int minTime, double minDistance, bool includeHeading )
+      {
+         if(minTime < 0)
+         {
+            throw new ArgumentOutOfRangeException( "minTime" );
+         }
+         if(minDistance < 0)
+         {
+            throw new ArgumentOutOfRangeException( "minDistance" );
+         }
+         if(IsListening)
+         {
+            throw new InvalidOperationException( "This Geolocator is already listening" );
+         }
 
-		private GeolocationContinuousListener listener;
+         listener = new GeolocationContinuousListener( manager, TimeSpan.FromMilliseconds( minTime ), providers );
+         listener.PositionChanged += OnListenerPositionChanged;
+         listener.PositionError += OnListenerPositionError;
 
-		private readonly object positionSync = new object();
-		private Position lastPosition;
+         Looper looper = Looper.MyLooper() ?? Looper.MainLooper;
+         for(int i = 0; i < providers.Length; ++i)
+         {
+            manager.RequestLocationUpdates( providers[i], minTime, (float)minDistance, listener, looper );
+         }
+      }
 
-		private void OnListenerPositionChanged (object sender, PositionEventArgs e)
-		{
-			if (!IsListening) // ignore anything that might come in afterwards
-				return;
+      public void StopListening()
+      {
+         if(listener == null)
+         {
+            return;
+         }
 
-			lock (this.positionSync)
-			{
-				this.lastPosition = e.Position;
+         listener.PositionChanged -= OnListenerPositionChanged;
+         listener.PositionError -= OnListenerPositionError;
 
-				var changed = PositionChanged;
-				if (changed != null)
-					changed (this, e);
-			}
-		}
-		
-		private void OnListenerPositionError (object sender, PositionErrorEventArgs e)
-		{
-			StopListening();
+         for(int i = 0; i < providers.Length; ++i)
+         {
+            manager.RemoveUpdates( listener );
+         }
 
-			var error = PositionError;
-			if (error != null)
-				error (this, e);
-		}
+         listener = null;
+      }
 
-		private static readonly DateTime Epoch = new DateTime (1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		internal static DateTimeOffset GetTimestamp (Location location)
-		{
-			return new DateTimeOffset (Epoch.AddMilliseconds (location.Time));
-		}
-	}
+      private void OnListenerPositionChanged( object sender, PositionEventArgs e )
+      {
+         if(!IsListening) // ignore anything that might come in afterwards
+         {
+            return;
+         }
+
+         lock(positionSync)
+         {
+            lastPosition = e.Position;
+
+            var changed = PositionChanged;
+            if(changed != null)
+            {
+               changed( this, e );
+            }
+         }
+      }
+
+      private void OnListenerPositionError( object sender, PositionErrorEventArgs e )
+      {
+         StopListening();
+
+         var error = PositionError;
+         if(error != null)
+         {
+            error( this, e );
+         }
+      }
+
+      internal static DateTimeOffset GetTimestamp( Location location )
+      {
+         return new DateTimeOffset( Epoch.AddMilliseconds( location.Time ) );
+      }
+   }
 }

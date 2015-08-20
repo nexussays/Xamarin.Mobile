@@ -18,54 +18,58 @@ using System;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Database;
+using Object = Java.Lang.Object;
 
 namespace Xamarin
 {
-	internal class AsyncQuery<T>
-		: AsyncQueryHandler
-	{
-		internal AsyncQuery (ContentResolver cr, Func<ICursor, T> selector)
-			: base (cr)
-		{
-			if (selector == null)
-				throw new ArgumentNullException ("selector");
+   internal class AsyncQuery<T> : AsyncQueryHandler
+   {
+      private readonly Func<ICursor, bool> predicate;
+      private readonly Func<ICursor, T> selector;
+      private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
 
-			this.selector = selector;
-		}
+      internal AsyncQuery( ContentResolver cr, Func<ICursor, T> selector )
+         : base( cr )
+      {
+         if(selector == null)
+         {
+            throw new ArgumentNullException( "selector" );
+         }
 
-		internal AsyncQuery (ContentResolver cr, Func<ICursor, T> selector, Func<ICursor, bool> predicate)
-			: this (cr, selector)
-		{
-			this.selector = selector;
-			this.predicate = predicate;
-		}
+         this.selector = selector;
+      }
 
-		public Task<T> Task
-		{
-			get { return this.tcs.Task; }
-		}
+      internal AsyncQuery( ContentResolver cr, Func<ICursor, T> selector, Func<ICursor, bool> predicate )
+         : this( cr, selector )
+      {
+         this.selector = selector;
+         this.predicate = predicate;
+      }
 
-		protected override void OnQueryComplete (int token, Java.Lang.Object cookie, ICursor cursor)
-		{
-			bool set = false;
-			while (cursor.MoveToNext())
-			{
-				if (this.predicate == null || this.predicate (cursor))
-				{
-					set = true;
-					this.tcs.SetResult (this.selector (cursor));
-					break;
-				}
-			}
+      public Task<T> Task
+      {
+         get { return tcs.Task; }
+      }
 
-			if (!set)
-				this.tcs.SetResult (default(T));
+      protected override void OnQueryComplete( int token, Object cookie, ICursor cursor )
+      {
+         bool set = false;
+         while(cursor.MoveToNext())
+         {
+            if(predicate == null || predicate( cursor ))
+            {
+               set = true;
+               tcs.SetResult( selector( cursor ) );
+               break;
+            }
+         }
 
-			base.OnQueryComplete (token, cookie, cursor);
-		}
+         if(!set)
+         {
+            tcs.SetResult( default(T) );
+         }
 
-		private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
-		private readonly Func<ICursor, T> selector;
-		private readonly Func<ICursor, bool> predicate;
-	}
+         base.OnQueryComplete( token, cookie, cursor );
+      }
+   }
 }

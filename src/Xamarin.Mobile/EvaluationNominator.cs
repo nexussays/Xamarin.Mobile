@@ -20,49 +20,56 @@ using System.Linq.Expressions;
 
 namespace Xamarin
 {
-	internal class EvaluationNominator
-		: ExpressionVisitor
-	{
-		internal EvaluationNominator (Func<Expression, bool> predicate)
-		{
-			if (predicate == null)
-				throw new ArgumentNullException ("predicate");
+   internal class EvaluationNominator : ExpressionVisitor
+   {
+      private readonly Func<Expression, bool> predicate;
+      private HashSet<Expression> candidates;
+      private bool cannotBeEvaluated;
 
-			this.predicate = predicate;
-		}
+      internal EvaluationNominator( Func<Expression, bool> predicate )
+      {
+         if(predicate == null)
+         {
+            throw new ArgumentNullException( "predicate" );
+         }
 
-		public HashSet<Expression> Nominate (Expression expression)
-		{
-			this.candidates = new HashSet<Expression>();
-			Visit (expression);
-			return this.candidates;
-		}
+         this.predicate = predicate;
+      }
 
-		public override Expression Visit (Expression expression)
-		{
-			if (expression == null)
-				return null;
+      public HashSet<Expression> Nominate( Expression expression )
+      {
+         candidates = new HashSet<Expression>();
+         Visit( expression );
+         return candidates;
+      }
 
-			bool currentState = this.cannotBeEvaluated;
-			this.cannotBeEvaluated = false;
+      public override Expression Visit( Expression expression )
+      {
+         if(expression == null)
+         {
+            return null;
+         }
 
-			base.Visit (expression);
+         bool currentState = cannotBeEvaluated;
+         cannotBeEvaluated = false;
 
-			if (!this.cannotBeEvaluated)
-			{
-				if (predicate (expression))
-					this.candidates.Add (expression);
-				else
-					this.cannotBeEvaluated = true;
-			}
+         base.Visit( expression );
 
-			this.cannotBeEvaluated |= currentState;
+         if(!cannotBeEvaluated)
+         {
+            if(predicate( expression ))
+            {
+               candidates.Add( expression );
+            }
+            else
+            {
+               cannotBeEvaluated = true;
+            }
+         }
 
-			return expression;
-		}
+         cannotBeEvaluated |= currentState;
 
-		private readonly Func<Expression, bool> predicate;
-		private bool cannotBeEvaluated;
-		private HashSet<Expression> candidates;
-	}
+         return expression;
+      }
+   }
 }

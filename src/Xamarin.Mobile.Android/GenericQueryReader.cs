@@ -22,98 +22,118 @@ using System.Text;
 using Android.Content;
 using Android.Content.Res;
 using Android.Database;
-using Android.Provider;
 
 namespace Xamarin
 {
-	internal class GenericQueryReader<T>
-		: IEnumerable<T>
-	{
-		public GenericQueryReader (ContentQueryTranslator translator, ContentResolver content, Resources resources, Func<ICursor, Resources, T> selector, string defaultSort)
-			: this (translator, content, resources, selector)
-		{
-			if (defaultSort == null)
-				throw new ArgumentNullException ("defaultSort");
+   internal class GenericQueryReader<T> : IEnumerable<T>
+   {
+      private readonly ContentResolver content;
+      private readonly string defaultSort;
+      private readonly Resources resources;
+      private readonly Func<ICursor, Resources, T> selector;
+      private readonly ContentQueryTranslator translator;
 
-			this.defaultSort = defaultSort;
-		}
+      public GenericQueryReader( ContentQueryTranslator translator, ContentResolver content, Resources resources,
+                                 Func<ICursor, Resources, T> selector, string defaultSort )
+         : this( translator, content, resources, selector )
+      {
+         if(defaultSort == null)
+         {
+            throw new ArgumentNullException( "defaultSort" );
+         }
 
-		public GenericQueryReader (ContentQueryTranslator translator, ContentResolver content, Resources resources, Func<ICursor, Resources, T> selector)
-		{
-			if (translator == null)
-				throw new ArgumentNullException ("translator");
-			if (content == null)
-				throw new ArgumentNullException ("content");
-			if (resources == null)
-				throw new ArgumentNullException ("resources");
-			if (selector == null)
-				throw new ArgumentNullException ("selector");
+         this.defaultSort = defaultSort;
+      }
 
-			this.translator = translator;
-			this.content = content;
-			this.resources = resources;
-			this.selector = selector;
-		}
+      public GenericQueryReader( ContentQueryTranslator translator, ContentResolver content, Resources resources,
+                                 Func<ICursor, Resources, T> selector )
+      {
+         if(translator == null)
+         {
+            throw new ArgumentNullException( "translator" );
+         }
+         if(content == null)
+         {
+            throw new ArgumentNullException( "content" );
+         }
+         if(resources == null)
+         {
+            throw new ArgumentNullException( "resources" );
+         }
+         if(selector == null)
+         {
+            throw new ArgumentNullException( "selector" );
+         }
 
-		public IEnumerator<T> GetEnumerator()
-		{
-			ICursor cursor = null;
-			try
-			{
-				string sortString = this.translator.SortString;
-				if ((sortString != null || this.defaultSort != null)
-					&& this.translator != null && (this.translator.Skip > 0 || this.translator.Take > 0))
-				{
-					StringBuilder limitb = new StringBuilder();
+         this.translator = translator;
+         this.content = content;
+         this.resources = resources;
+         this.selector = selector;
+      }
 
-					if (sortString == null)
-						limitb.Append (this.defaultSort);
+      public IEnumerator<T> GetEnumerator()
+      {
+         ICursor cursor = null;
+         try
+         {
+            string sortString = translator.SortString;
+            if((sortString != null || defaultSort != null) && translator != null &&
+               (translator.Skip > 0 || translator.Take > 0))
+            {
+               StringBuilder limitb = new StringBuilder();
 
-					limitb.Append (" LIMIT ");
+               if(sortString == null)
+               {
+                  limitb.Append( defaultSort );
+               }
 
-					if (this.translator.Skip > 0)
-					{
-						limitb.Append (this.translator.Skip);
-						if (this.translator.Take > 0)
-							limitb.Append (",");
-					}
+               limitb.Append( " LIMIT " );
 
-					if (this.translator.Take > 0)
-						limitb.Append (this.translator.Take);
+               if(translator.Skip > 0)
+               {
+                  limitb.Append( translator.Skip );
+                  if(translator.Take > 0)
+                  {
+                     limitb.Append( "," );
+                  }
+               }
 
-					sortString = (sortString == null) ? limitb.ToString() : sortString + limitb;
-				}
+               if(translator.Take > 0)
+               {
+                  limitb.Append( translator.Take );
+               }
 
-				string[] projections = (translator.Projections != null)
-			                                ? translator.Projections
-												.Where (p => p.Columns != null)
-												.SelectMany (t => t.Columns)
-												.ToArray()
-			                                : null;
+               sortString = (sortString == null) ? limitb.ToString() : sortString + limitb;
+            }
 
-				cursor = this.content.Query (this.translator.Table, projections,
-				                             this.translator.QueryString, this.translator.ClauseParameters,
-				                             sortString);
+            string[] projections = (translator.Projections != null)
+               ? translator.Projections.Where( p => p.Columns != null ).SelectMany( t => t.Columns ).ToArray()
+               : null;
 
-				while (cursor.MoveToNext())
-					yield return this.selector (cursor, this.resources);
-			}
-			finally
-			{
-				if (cursor != null)
-					cursor.Close();
-			}
-		}
+            cursor = content.Query(
+               translator.Table,
+               projections,
+               translator.QueryString,
+               translator.ClauseParameters,
+               sortString );
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+            while(cursor.MoveToNext())
+            {
+               yield return selector( cursor, resources );
+            }
+         }
+         finally
+         {
+            if(cursor != null)
+            {
+               cursor.Close();
+            }
+         }
+      }
 
-		private readonly string defaultSort;
-		private readonly Func<ICursor, Resources, T> selector;
-		private readonly ContentQueryTranslator translator;
-		private readonly ContentResolver content;
-		private readonly Resources resources;
-	}
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+         return GetEnumerator();
+      }
+   }
 }

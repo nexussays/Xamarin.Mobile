@@ -18,13 +18,13 @@ using System;
 
 namespace Xamarin
 {
-	internal static class DateTimeExtensions
-	{
-		public static long ToAndroidTimestamp (this DateTime self)
-		{
-			return (long)self.ToUniversalTime().Subtract (Epoch).TotalMilliseconds;
-		}
+   internal static class DateTimeExtensions
+   {
+      private static readonly DateTime Epoch = new DateTime( 1970, 1, 1 );
 
-		private static readonly DateTime Epoch = new DateTime (1970, 1, 1);
-	}
+      public static long ToAndroidTimestamp( this DateTime self )
+      {
+         return (long)self.ToUniversalTime().Subtract( Epoch ).TotalMilliseconds;
+      }
+   }
 }

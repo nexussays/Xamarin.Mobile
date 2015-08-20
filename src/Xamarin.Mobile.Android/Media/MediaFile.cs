@@ -18,93 +18,112 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Android.Content;
-using File = System.IO.File;
-using IOException = System.IO.IOException;
+using Uri = Android.Net.Uri;
 
 namespace Xamarin.Media
 {
-	public static class MediaFileExtensions
-	{
-		public static Task<MediaFile> GetMediaFileExtraAsync (this Intent self, Context context)
-		{
-			if (self == null)
-				throw new ArgumentNullException ("self");
-			if (context == null)
-				throw new ArgumentNullException ("context");
+   public static class MediaFileExtensions
+   {
+      public static Task<MediaFile> GetMediaFileExtraAsync( this Intent self, Context context )
+      {
+         if(self == null)
+         {
+            throw new ArgumentNullException( "self" );
+         }
+         if(context == null)
+         {
+            throw new ArgumentNullException( "context" );
+         }
 
-			string action = self.GetStringExtra ("action");
-			if (action == null)
-				throw new ArgumentException ("Intent was not results from MediaPicker", "self");
-			
-			var uri = (Android.Net.Uri)self.GetParcelableExtra (MediaFile.ExtraName);		
-			bool isPhoto = self.GetBooleanExtra ("isPhoto", false);			
-			var path = (Android.Net.Uri)self.GetParcelableExtra ("path");
+         string action = self.GetStringExtra( "action" );
+         if(action == null)
+         {
+            throw new ArgumentException( "Intent was not results from MediaPicker", "self" );
+         }
 
-			return MediaPickerActivity.GetMediaFileAsync (context, 0, action, isPhoto, ref path, uri)
-				.ContinueWith (t => t.Result.ToTask()).Unwrap();
-		}
-	}
+         var uri = (Uri)self.GetParcelableExtra( MediaFile.ExtraName );
+         bool isPhoto = self.GetBooleanExtra( "isPhoto", false );
+         var path = (Uri)self.GetParcelableExtra( "path" );
 
-	public sealed class MediaFile
-		: IDisposable
-	{
-		internal MediaFile (string path, bool deletePathOnDispose)
-		{
-			this.deletePathOnDispose = deletePathOnDispose;
-			this.path = path;
-		}
+         return
+            MediaPickerActivity.GetMediaFileAsync( context, 0, action, isPhoto, ref path, uri )
+                               .ContinueWith( t => t.Result.ToTask() )
+                               .Unwrap();
+      }
+   }
 
-		public string Path
-		{
-			get
-			{
-				if (this.isDisposed)
-					throw new ObjectDisposedException (null);
+   public sealed class MediaFile : IDisposable
+   {
+      internal const string ExtraName = "MediaFile";
+      private readonly bool deletePathOnDispose;
+      private readonly string path;
+      private bool isDisposed;
 
-				return this.path;
-			}
-		}
+      internal MediaFile( string path, bool deletePathOnDispose )
+      {
+         this.deletePathOnDispose = deletePathOnDispose;
+         this.path = path;
+      }
 
-		public Stream GetStream()
-		{
-			if (this.isDisposed)
-				throw new ObjectDisposedException (null);
+      public string Path
+      {
+         get
+         {
+            if(isDisposed)
+            {
+               throw new ObjectDisposedException( null );
+            }
 
-			return File.OpenRead (this.path);
-		}
+            return path;
+         }
+      }
 
-		public void Dispose()
-		{
-			Dispose (true);
-			GC.SuppressFinalize (this);
-		}
+      public void Dispose()
+      {
+         Dispose( true );
+         GC.SuppressFinalize( this );
+      }
 
-		private bool isDisposed;
-		private readonly bool deletePathOnDispose;
-		private readonly string path;
+      public Stream GetStream()
+      {
+         if(isDisposed)
+         {
+            throw new ObjectDisposedException( null );
+         }
 
-		internal const string ExtraName = "MediaFile";
-		
-		private void Dispose (bool disposing)
-		{
-			if (this.isDisposed)
-				return;
+         return File.OpenRead( path );
+      }
 
-			this.isDisposed = true;
-			if (this.deletePathOnDispose) {
-				try {
-					File.Delete (this.path);
-					// We don't really care if this explodes for a normal IO reason.
-				} catch (UnauthorizedAccessException) {
-				} catch (DirectoryNotFoundException) {
-				} catch (IOException) {
-				}
-			}
-		}
+      private void Dispose( bool disposing )
+      {
+         if(isDisposed)
+         {
+            return;
+         }
 
-		~MediaFile()
-		{
-			Dispose (false);
-		}
-	}
+         isDisposed = true;
+         if(deletePathOnDispose)
+         {
+            try
+            {
+               File.Delete( path );
+               // We don't really care if this explodes for a normal IO reason.
+            }
+            catch(UnauthorizedAccessException)
+            {
+            }
+            catch(DirectoryNotFoundException)
+            {
+            }
+            catch(IOException)
+            {
+            }
+         }
+      }
+
+      ~MediaFile()
+      {
+         Dispose( false );
+      }
+   }
 }

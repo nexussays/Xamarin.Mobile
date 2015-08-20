@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 #if __UNIFIED__
 using UIKit;
 using Foundation;
+
 #else
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
@@ -26,23 +27,22 @@ using MonoTouch.Foundation;
 
 namespace Xamarin.Media
 {
-	public sealed class MediaPickerController
-		: UIImagePickerController
-	{
-		internal MediaPickerController (MediaPickerDelegate mpDelegate)
-		{
-			base.Delegate = mpDelegate;
-		}
+   public sealed class MediaPickerController : UIImagePickerController
+   {
+      internal MediaPickerController( MediaPickerDelegate mpDelegate )
+      {
+         base.Delegate = mpDelegate;
+      }
 
-		public override NSObject Delegate
-		{
-			get { return base.Delegate; }
-			set { throw new NotSupportedException(); }
-		}
+      public override NSObject Delegate
+      {
+         get { return base.Delegate; }
+         set { throw new NotSupportedException(); }
+      }
 
-		public Task<MediaFile> GetResultAsync()
-		{
-			return ((MediaPickerDelegate)Delegate).Task;
-		}
-	}
+      public Task<MediaFile> GetResultAsync()
+      {
+         return ((MediaPickerDelegate)Delegate).Task;
+      }
+   }
 }

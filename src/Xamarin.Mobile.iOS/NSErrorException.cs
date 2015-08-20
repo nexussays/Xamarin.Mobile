@@ -15,28 +15,23 @@
 //
 
 using System;
-
 #if __UNIFIED__
 using Foundation;
+
 #else
 using MonoTouch.Foundation;
 #endif
 
 namespace Xamarin
 {
-	public class NSErrorException
-		: Exception
-	{
-		internal NSErrorException (NSError error)
-			: base (error.LocalizedDescription)
-		{
-			Error = error;
-		}
+   public class NSErrorException : Exception
+   {
+      internal NSErrorException( NSError error )
+         : base( error.LocalizedDescription )
+      {
+         Error = error;
+      }
 
-		public NSError Error
-		{
-			get;
-			private set;
-		}
-	}
+      public NSError Error { get; private set; }
+   }
 }

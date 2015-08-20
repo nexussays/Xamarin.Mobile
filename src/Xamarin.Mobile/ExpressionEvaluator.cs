@@ -20,50 +20,55 @@ using System.Linq.Expressions;
 
 namespace Xamarin
 {
-	public static class ExpressionEvaluator
-	{
-		public static Expression Evaluate (Expression expression, Func<Expression, bool> predicate)
-		{
-			HashSet<Expression> canidates = new EvaluationNominator (predicate).Nominate (expression);
-			return new SubtreeEvaluator (canidates).Visit (expression);
-		}
+   public static class ExpressionEvaluator
+   {
+      public static Expression Evaluate( Expression expression, Func<Expression, bool> predicate )
+      {
+         HashSet<Expression> canidates = new EvaluationNominator( predicate ).Nominate( expression );
+         return new SubtreeEvaluator( canidates ).Visit( expression );
+      }
 
-		public static Expression Evaluate (Expression expression)
-		{
-			return Evaluate (expression, e => e.NodeType != ExpressionType.Parameter);
-		}
+      public static Expression Evaluate( Expression expression )
+      {
+         return Evaluate( expression, e => e.NodeType != ExpressionType.Parameter );
+      }
 
-		private class SubtreeEvaluator
-			: ExpressionVisitor
-		{
-			public SubtreeEvaluator (HashSet<Expression> candidate)
-			{
-				this.candidate = candidate;
-			}
+      private class SubtreeEvaluator : ExpressionVisitor
+      {
+         private readonly HashSet<Expression> candidate;
 
-			public override Expression Visit (Expression expression)
-			{
-				if (expression == null)
-					return null;
+         public SubtreeEvaluator( HashSet<Expression> candidate )
+         {
+            this.candidate = candidate;
+         }
 
-				if (this.candidate.Contains (expression))
-					return EvaluateCandidate (expression);
+         public override Expression Visit( Expression expression )
+         {
+            if(expression == null)
+            {
+               return null;
+            }
 
-				return base.Visit (expression);
-			}
+            if(candidate.Contains( expression ))
+            {
+               return EvaluateCandidate( expression );
+            }
 
-			private readonly HashSet<Expression> candidate;
+            return base.Visit( expression );
+         }
 
-			private Expression EvaluateCandidate (Expression expression)
-			{
-				if (expression.NodeType == ExpressionType.Constant)
-					return expression;
+         private Expression EvaluateCandidate( Expression expression )
+         {
+            if(expression.NodeType == ExpressionType.Constant)
+            {
+               return expression;
+            }
 
-				LambdaExpression lambda = Expression.Lambda (expression);
-				Delegate fn = lambda.Compile();
+            LambdaExpression lambda = Expression.Lambda( expression );
+            Delegate fn = lambda.Compile();
 
-				return Expression.Constant (fn.DynamicInvoke (null), expression.Type);
-			}
-		}
-	}
+            return Expression.Constant( fn.DynamicInvoke( null ), expression.Type );
+         }
+      }
+   }
 }

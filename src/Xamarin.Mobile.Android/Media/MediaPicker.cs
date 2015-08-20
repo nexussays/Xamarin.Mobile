@@ -25,179 +25,208 @@ using Android.Provider;
 
 namespace Xamarin.Media
 {
-	public class MediaPicker
-	{
-		public MediaPicker (Context context)
-		{
-			if (context == null)
-				throw new ArgumentNullException ("context");
+   public class MediaPicker
+   {
+      private readonly Context context;
+      private TaskCompletionSource<MediaFile> completionSource;
+      private int requestId;
 
-			this.context = context;
-			IsCameraAvailable = context.PackageManager.HasSystemFeature (PackageManager.FeatureCamera);
+      public MediaPicker( Context context )
+      {
+         if(context == null)
+         {
+            throw new ArgumentNullException( "context" );
+         }
 
-			if (Build.VERSION.SdkInt >= BuildVersionCodes.Gingerbread)
-				IsCameraAvailable |= context.PackageManager.HasSystemFeature (PackageManager.FeatureCameraFront);
-		}
+         this.context = context;
+         IsCameraAvailable = context.PackageManager.HasSystemFeature( PackageManager.FeatureCamera );
 
-		public bool IsCameraAvailable
-		{
-			get;
-			private set;
-		}
+         if(Build.VERSION.SdkInt >= BuildVersionCodes.Gingerbread)
+         {
+            IsCameraAvailable |= context.PackageManager.HasSystemFeature( PackageManager.FeatureCameraFront );
+         }
+      }
 
-		public bool PhotosSupported
-		{
-			get { return true; }
-		}
+      public bool IsCameraAvailable { get; private set; }
 
-		public bool VideosSupported
-		{
-			get { return true; }
-		}
+      public bool PhotosSupported
+      {
+         get { return true; }
+      }
 
-		public Intent GetPickPhotoUI()
-		{
-			int id = GetRequestId();
-			return CreateMediaIntent (id, "image/*", Intent.ActionPick, null, tasked: false);
-		}
-		
-		public Intent GetTakePhotoUI (StoreCameraMediaOptions options)
-		{
-			if (!IsCameraAvailable)
-				throw new NotSupportedException();
+      public bool VideosSupported
+      {
+         get { return true; }
+      }
 
-			VerifyOptions (options);
+      public Intent GetPickPhotoUI()
+      {
+         int id = GetRequestId();
+         return CreateMediaIntent( id, "image/*", Intent.ActionPick, null, tasked: false );
+      }
 
-			int id = GetRequestId();
-			return CreateMediaIntent (id, "image/*", MediaStore.ActionImageCapture, options, tasked: false);
-		}
+      public Intent GetPickVideoUI()
+      {
+         int id = GetRequestId();
+         return CreateMediaIntent( id, "video/*", Intent.ActionPick, null, tasked: false );
+      }
 
-		public Intent GetPickVideoUI()
-		{
-			int id = GetRequestId();
-			return CreateMediaIntent (id, "video/*", Intent.ActionPick, null, tasked: false);
-		}
+      public Intent GetTakePhotoUI( StoreCameraMediaOptions options )
+      {
+         if(!IsCameraAvailable)
+         {
+            throw new NotSupportedException();
+         }
 
-		public Intent GetTakeVideoUI (StoreVideoOptions options)
-		{
-			if (!IsCameraAvailable)
-				throw new NotSupportedException();
+         VerifyOptions( options );
 
-			VerifyOptions (options);
+         int id = GetRequestId();
+         return CreateMediaIntent( id, "image/*", MediaStore.ActionImageCapture, options, tasked: false );
+      }
 
-			return CreateMediaIntent (GetRequestId(), "video/*", MediaStore.ActionVideoCapture, options, tasked: false);
-		}
+      public Intent GetTakeVideoUI( StoreVideoOptions options )
+      {
+         if(!IsCameraAvailable)
+         {
+            throw new NotSupportedException();
+         }
 
-		[Obsolete ("Use GetPickPhotoUI instead.")]
-		public Task<MediaFile> PickPhotoAsync()
-		{
-			return TakeMediaAsync ("image/*", Intent.ActionPick, null);
-		}
+         VerifyOptions( options );
 
-		[Obsolete ("Use GetTakePhotoUI instead.")]
-		public Task<MediaFile> TakePhotoAsync (StoreCameraMediaOptions options)
-		{
-			if (!IsCameraAvailable)
-				throw new NotSupportedException();
+         return CreateMediaIntent( GetRequestId(), "video/*", MediaStore.ActionVideoCapture, options, tasked: false );
+      }
 
-			VerifyOptions (options);
+      [Obsolete( "Use GetPickPhotoUI instead." )]
+      public Task<MediaFile> PickPhotoAsync()
+      {
+         return TakeMediaAsync( "image/*", Intent.ActionPick, null );
+      }
 
-			return TakeMediaAsync ("image/*", MediaStore.ActionImageCapture, options);
-		}
+      [Obsolete( "Use GetPickVideoUI instead." )]
+      public Task<MediaFile> PickVideoAsync()
+      {
+         return TakeMediaAsync( "video/*", Intent.ActionPick, null );
+      }
 
-		[Obsolete ("Use GetPickVideoUI instead.")]
-		public Task<MediaFile> PickVideoAsync()
-		{
-			return TakeMediaAsync ("video/*", Intent.ActionPick, null);
-		}
+      [Obsolete( "Use GetTakePhotoUI instead." )]
+      public Task<MediaFile> TakePhotoAsync( StoreCameraMediaOptions options )
+      {
+         if(!IsCameraAvailable)
+         {
+            throw new NotSupportedException();
+         }
 
-		[Obsolete ("use GetTakeVideoUI instead.")]
-		public Task<MediaFile> TakeVideoAsync (StoreVideoOptions options)
-		{
-			if (!IsCameraAvailable)
-				throw new NotSupportedException();
+         VerifyOptions( options );
 
-			VerifyOptions (options);
+         return TakeMediaAsync( "image/*", MediaStore.ActionImageCapture, options );
+      }
 
-			return TakeMediaAsync ("video/*", MediaStore.ActionVideoCapture, options);
-		}
+      [Obsolete( "use GetTakeVideoUI instead." )]
+      public Task<MediaFile> TakeVideoAsync( StoreVideoOptions options )
+      {
+         if(!IsCameraAvailable)
+         {
+            throw new NotSupportedException();
+         }
 
-		private readonly Context context;
-		private int requestId;
-		private TaskCompletionSource<MediaFile> completionSource;
+         VerifyOptions( options );
 
-		private void VerifyOptions (StoreMediaOptions options)
-		{
-			if (options == null)
-				throw new ArgumentNullException ("options");
-			if (Path.IsPathRooted (options.Directory))
-				throw new ArgumentException ("options.Directory must be a relative path", "options");
-		}
+         return TakeMediaAsync( "video/*", MediaStore.ActionVideoCapture, options );
+      }
 
-		private Intent CreateMediaIntent (int id, string type, string action, StoreMediaOptions options, bool tasked = true)
-		{
-			Intent pickerIntent = new Intent (this.context, typeof (MediaPickerActivity));
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraId, id);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraType, type);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraAction, action);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraTasked, tasked);
+      private Intent CreateMediaIntent( int id, string type, string action, StoreMediaOptions options,
+                                        bool tasked = true )
+      {
+         Intent pickerIntent = new Intent( context, typeof(MediaPickerActivity) );
+         pickerIntent.PutExtra( MediaPickerActivity.ExtraId, id );
+         pickerIntent.PutExtra( MediaPickerActivity.ExtraType, type );
+         pickerIntent.PutExtra( MediaPickerActivity.ExtraAction, action );
+         pickerIntent.PutExtra( MediaPickerActivity.ExtraTasked, tasked );
 
-			if (options != null) {
-				pickerIntent.PutExtra (MediaPickerActivity.ExtraPath, options.Directory);
-				pickerIntent.PutExtra (MediaStore.Images.ImageColumns.Title, options.Name);
+         if(options != null)
+         {
+            pickerIntent.PutExtra( MediaPickerActivity.ExtraPath, options.Directory );
+            pickerIntent.PutExtra( MediaStore.Images.ImageColumns.Title, options.Name );
 
-				var vidOptions = (options as StoreVideoOptions);
-				if (vidOptions != null) {
-					pickerIntent.PutExtra (MediaStore.ExtraDurationLimit, (int)vidOptions.DesiredLength.TotalSeconds);
-					pickerIntent.PutExtra (MediaStore.ExtraVideoQuality, (int)vidOptions.Quality);
-				}
-			}
+            var vidOptions = (options as StoreVideoOptions);
+            if(vidOptions != null)
+            {
+               pickerIntent.PutExtra( MediaStore.ExtraDurationLimit, (int)vidOptions.DesiredLength.TotalSeconds );
+               pickerIntent.PutExtra( MediaStore.ExtraVideoQuality, (int)vidOptions.Quality );
+            }
+         }
 
-			return pickerIntent;
-		}
+         return pickerIntent;
+      }
 
-		private int GetRequestId()
-		{
-			int id = this.requestId;
-			if (this.requestId == Int32.MaxValue)
-				this.requestId = 0;
-			else
-				this.requestId++;
+      private int GetRequestId()
+      {
+         int id = requestId;
+         if(requestId == Int32.MaxValue)
+         {
+            requestId = 0;
+         }
+         else
+         {
+            requestId++;
+         }
 
-			return id;
-		}
+         return id;
+      }
 
-		private Task<MediaFile> TakeMediaAsync (string type, string action, StoreMediaOptions options)
-		{
-			int id = GetRequestId();
+      private Task<MediaFile> TakeMediaAsync( string type, string action, StoreMediaOptions options )
+      {
+         int id = GetRequestId();
 
-			var ntcs = new TaskCompletionSource<MediaFile> (id);
-			if (Interlocked.CompareExchange (ref this.completionSource, ntcs, null) != null)
-				throw new InvalidOperationException ("Only one operation can be active at a time");
+         var ntcs = new TaskCompletionSource<MediaFile>( id );
+         if(Interlocked.CompareExchange( ref completionSource, ntcs, null ) != null)
+         {
+            throw new InvalidOperationException( "Only one operation can be active at a time" );
+         }
 
-			this.context.StartActivity (CreateMediaIntent (id, type, action, options));
+         context.StartActivity( CreateMediaIntent( id, type, action, options ) );
 
-			EventHandler<MediaPickedEventArgs> handler = null;
-			handler = (s, e) =>
-			{
-				TaskCompletionSource<MediaFile> tcs = Interlocked.Exchange (ref this.completionSource, null);
+         EventHandler<MediaPickedEventArgs> handler = null;
+         handler = ( s, e ) =>
+         {
+            TaskCompletionSource<MediaFile> tcs = Interlocked.Exchange( ref completionSource, null );
 
-				MediaPickerActivity.MediaPicked -= handler;
+            MediaPickerActivity.MediaPicked -= handler;
 
-				if (e.RequestId != id)
-					return;
+            if(e.RequestId != id)
+            {
+               return;
+            }
 
-				if (e.Error != null)
-					tcs.SetException (e.Error);
-				else if (e.IsCanceled)
-					tcs.SetCanceled();
-				else
-					tcs.SetResult (e.Media);
-			};
+            if(e.Error != null)
+            {
+               tcs.SetException( e.Error );
+            }
+            else if(e.IsCanceled)
+            {
+               tcs.SetCanceled();
+            }
+            else
+            {
+               tcs.SetResult( e.Media );
+            }
+         };
 
-			MediaPickerActivity.MediaPicked += handler;
+         MediaPickerActivity.MediaPicked += handler;
 
-			return ntcs.Task;
-		}
-	}
+         return ntcs.Task;
+      }
+
+      private void VerifyOptions( StoreMediaOptions options )
+      {
+         if(options == null)
+         {
+            throw new ArgumentNullException( "options" );
+         }
+         if(Path.IsPathRooted( options.Directory ))
+         {
+            throw new ArgumentException( "options.Directory must be a relative path", "options" );
+         }
+      }
+   }
 }

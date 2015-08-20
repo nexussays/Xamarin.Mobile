@@ -16,35 +16,23 @@
 
 namespace Xamarin.Contacts
 {
-	public enum PhoneType
-	{
-		Home,
-		HomeFax,
-		Work,
-		WorkFax,
-		Pager,
-		Mobile,
-		Other,
-	}
+   public enum PhoneType
+   {
+      Home,
+      HomeFax,
+      Work,
+      WorkFax,
+      Pager,
+      Mobile,
+      Other,
+   }
 
-	public class Phone
-	{
-		public PhoneType Type
-		{
-			get;
-			set;
-		}
+   public class Phone
+   {
+      public string Label { get; set; }
 
-		public string Label
-		{
-			get;
-			set;
-		}
+      public string Number { get; set; }
 
-		public string Number
-		{
-			get;
-			set;
-		}
-	}
+      public PhoneType Type { get; set; }
+   }
 }

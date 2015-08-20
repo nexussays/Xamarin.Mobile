@@ -15,15 +15,15 @@
 //
 
 using System;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
-
 #if __UNIFIED__
 using AddressBook;
 using UIKit;
-using Foundation;
+
 #else
 using MonoTouch.AddressBook;
 using MonoTouch.UIKit;
@@ -32,123 +32,133 @@ using MonoTouch.Foundation;
 
 namespace Xamarin.Contacts
 {
-	public class AddressBook
-		: IEnumerable<Contact> //IQueryable<Contact>
-	{
-		public bool IsReadOnly
-		{
-			get { return true; }
-		}
+   public class AddressBook : IEnumerable<Contact> //IQueryable<Contact>
+   {
+      private ABAddressBook addressBook;
+      private IQueryProvider provider;
 
-		public bool SingleContactsSupported
-		{
-			get { return true; }
-		}
+      public bool AggregateContactsSupported
+      {
+         get { return false; }
+      }
 
-		public bool AggregateContactsSupported
-		{
-			get { return false; }
-		}
+      public bool IsReadOnly
+      {
+         get { return true; }
+      }
 
-		public bool PreferContactAggregation
-		{
-			get;
-			set;
-		}
+      public bool LoadSupported
+      {
+         get { return true; }
+      }
 
-		public bool LoadSupported
-		{
-			get { return true; }
-		}
+      public bool PreferContactAggregation { get; set; }
 
-		public Task<bool> RequestPermission()
-		{
-			var tcs = new TaskCompletionSource<bool>();
-			if (UIDevice.CurrentDevice.CheckSystemVersion (6, 0))
-			{
-				var status = ABAddressBook.GetAuthorizationStatus();
-				if (status == ABAuthorizationStatus.Denied || status == ABAuthorizationStatus.Restricted)
-					tcs.SetResult (false);
-				else
-				{
-					if (this.addressBook == null)
-					{
-						this.addressBook = new ABAddressBook();
-						this.provider = new ContactQueryProvider (this.addressBook);
-					}
+      public bool SingleContactsSupported
+      {
+         get { return true; }
+      }
 
-					if (status == ABAuthorizationStatus.NotDetermined)
-					{
-						this.addressBook.RequestAccess ((s,e) =>
-						{
-							tcs.SetResult (s);
-							if (!s)
-							{
-								this.addressBook.Dispose();
-								this.addressBook = null;
-								this.provider = null;
-							}
-						});
-					}
-					else
-						tcs.SetResult (true);
-				}
-			}
-			else
-				tcs.SetResult (true);
+      public IEnumerator<Contact> GetEnumerator()
+      {
+         CheckStatus();
 
-			return tcs.Task;
-		}
+         return addressBook.GetPeople().Select( ContactHelper.GetContact ).GetEnumerator();
+      }
 
-		public IEnumerator<Contact> GetEnumerator()
-		{
-			CheckStatus();
+      public Contact Load( string id )
+      {
+         if(String.IsNullOrWhiteSpace( id ))
+         {
+            throw new ArgumentNullException( "id" );
+         }
 
-			return this.addressBook.GetPeople().Select (ContactHelper.GetContact).GetEnumerator();
-		}
+         CheckStatus();
 
-		public Contact Load (string id)
-		{
-			if (String.IsNullOrWhiteSpace (id))
-				throw new ArgumentNullException ("id");
+         int rowId;
+         if(!Int32.TryParse( id, out rowId ))
+         {
+            throw new ArgumentException( "Not a valid contact ID", "id" );
+         }
 
-			CheckStatus();
+         ABPerson person = addressBook.GetPerson( rowId );
+         if(person == null)
+         {
+            return null;
+         }
 
-			int rowId;
-			if (!Int32.TryParse (id, out rowId))
-				throw new ArgumentException ("Not a valid contact ID", "id");
-			
-			ABPerson person = this.addressBook.GetPerson (rowId);
-			if (person == null)
-				return null;
-			
-			return ContactHelper.GetContact (person);
-		}
-		
-		private ABAddressBook addressBook;
-		private IQueryProvider provider;
+         return ContactHelper.GetContact( person );
+      }
 
-		private void CheckStatus()
-		{
-			if (UIDevice.CurrentDevice.CheckSystemVersion (6, 0))
-			{
-				var status = ABAddressBook.GetAuthorizationStatus();
-				if (status != ABAuthorizationStatus.Authorized)
-					throw new System.Security.SecurityException ("AddressBook has not been granted permission");
-			}
+      public Task<bool> RequestPermission()
+      {
+         var tcs = new TaskCompletionSource<bool>();
+         if(UIDevice.CurrentDevice.CheckSystemVersion( 6, 0 ))
+         {
+            var status = ABAddressBook.GetAuthorizationStatus();
+            if(status == ABAuthorizationStatus.Denied || status == ABAuthorizationStatus.Restricted)
+            {
+               tcs.SetResult( false );
+            }
+            else
+            {
+               if(addressBook == null)
+               {
+                  addressBook = new ABAddressBook();
+                  provider = new ContactQueryProvider( addressBook );
+               }
 
-			if (this.addressBook == null)
-			{
-				this.addressBook = new ABAddressBook();
-				this.provider = new ContactQueryProvider (this.addressBook);
-			}
-		}
-		
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-		
+               if(status == ABAuthorizationStatus.NotDetermined)
+               {
+                  addressBook.RequestAccess(
+                     ( s, e ) =>
+                     {
+                        tcs.SetResult( s );
+                        if(!s)
+                        {
+                           addressBook.Dispose();
+                           addressBook = null;
+                           provider = null;
+                        }
+                     } );
+               }
+               else
+               {
+                  tcs.SetResult( true );
+               }
+            }
+         }
+         else
+         {
+            tcs.SetResult( true );
+         }
+
+         return tcs.Task;
+      }
+
+      private void CheckStatus()
+      {
+         if(UIDevice.CurrentDevice.CheckSystemVersion( 6, 0 ))
+         {
+            var status = ABAddressBook.GetAuthorizationStatus();
+            if(status != ABAuthorizationStatus.Authorized)
+            {
+               throw new SecurityException( "AddressBook has not been granted permission" );
+            }
+         }
+
+         if(addressBook == null)
+         {
+            addressBook = new ABAddressBook();
+            provider = new ContactQueryProvider( addressBook );
+         }
+      }
+
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+         return GetEnumerator();
+      }
+
 //		Type IQueryable.ElementType
 //		{
 //			get { return typeof(Contact); }
@@ -163,5 +173,5 @@ namespace Xamarin.Contacts
 //		{
 //			get { return this.provider; }
 //		}
-	}
+   }
 }
