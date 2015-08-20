@@ -1,0 +1,132 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{51FCED1B-4AA7-44D1-8B42-BFC6F683A120}"
+	ProjectSection(SolutionItems) = preProject
+		docs\en\index.xml = docs\en\index.xml
+		docs\en\ns-Xamarin.Contacts.xml = docs\en\ns-Xamarin.Contacts.xml
+		docs\en\ns-Xamarin.Geolocation.xml = docs\en\ns-Xamarin.Geolocation.xml
+		docs\en\ns-Xamarin.Media.xml = docs\en\ns-Xamarin.Media.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xamarin.Media", "Xamarin.Media", "{AC43D45B-B591-4C52-B2B4-188B1BD4A53D}"
+	ProjectSection(SolutionItems) = preProject
+		docs\en\Xamarin.Media\CameraDevice.xml = docs\en\Xamarin.Media\CameraDevice.xml
+		docs\en\Xamarin.Media\MediaFile.xml = docs\en\Xamarin.Media\MediaFile.xml
+		docs\en\Xamarin.Media\MediaFileExtensions.xml = docs\en\Xamarin.Media\MediaFileExtensions.xml
+		docs\en\Xamarin.Media\MediaFileNotFoundException.xml = docs\en\Xamarin.Media\MediaFileNotFoundException.xml
+		docs\en\Xamarin.Media\MediaPicker.xml = docs\en\Xamarin.Media\MediaPicker.xml
+		docs\en\Xamarin.Media\MediaPickerController.xml = docs\en\Xamarin.Media\MediaPickerController.xml
+		docs\en\Xamarin.Media\StoreCameraMediaOptions.xml = docs\en\Xamarin.Media\StoreCameraMediaOptions.xml
+		docs\en\Xamarin.Media\StoreMediaOptions.xml = docs\en\Xamarin.Media\StoreMediaOptions.xml
+		docs\en\Xamarin.Media\StoreVideoOptions.xml = docs\en\Xamarin.Media\StoreVideoOptions.xml
+		docs\en\Xamarin.Media\VideoQuality.xml = docs\en\Xamarin.Media\VideoQuality.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xamarin.Contacts", "Xamarin.Contacts", "{1B4EBF83-FFBE-4EFD-A912-CA1D8F8A325E}"
+	ProjectSection(SolutionItems) = preProject
+		docs\en\Xamarin.Contacts\Address.xml = docs\en\Xamarin.Contacts\Address.xml
+		docs\en\Xamarin.Contacts\AddressBook.xml = docs\en\Xamarin.Contacts\AddressBook.xml
+		docs\en\Xamarin.Contacts\AddressType.xml = docs\en\Xamarin.Contacts\AddressType.xml
+		docs\en\Xamarin.Contacts\Contact.xml = docs\en\Xamarin.Contacts\Contact.xml
+		docs\en\Xamarin.Contacts\Email.xml = docs\en\Xamarin.Contacts\Email.xml
+		docs\en\Xamarin.Contacts\EmailType.xml = docs\en\Xamarin.Contacts\EmailType.xml
+		docs\en\Xamarin.Contacts\InstantMessagingAccount.xml = docs\en\Xamarin.Contacts\InstantMessagingAccount.xml
+		docs\en\Xamarin.Contacts\InstantMessagingService.xml = docs\en\Xamarin.Contacts\InstantMessagingService.xml
+		docs\en\Xamarin.Contacts\Note.xml = docs\en\Xamarin.Contacts\Note.xml
+		docs\en\Xamarin.Contacts\Organization.xml = docs\en\Xamarin.Contacts\Organization.xml
+		docs\en\Xamarin.Contacts\OrganizationType.xml = docs\en\Xamarin.Contacts\OrganizationType.xml
+		docs\en\Xamarin.Contacts\Phone.xml = docs\en\Xamarin.Contacts\Phone.xml
+		docs\en\Xamarin.Contacts\PhoneType.xml = docs\en\Xamarin.Contacts\PhoneType.xml
+		docs\en\Xamarin.Contacts\Relationship.xml = docs\en\Xamarin.Contacts\Relationship.xml
+		docs\en\Xamarin.Contacts\RelationshipType.xml = docs\en\Xamarin.Contacts\RelationshipType.xml
+		docs\en\Xamarin.Contacts\Website.xml = docs\en\Xamarin.Contacts\Website.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xamarin.Geolocation", "Xamarin.Geolocation", "{6489785D-D135-4E6A-89B0-78E2FBE5CF68}"
+	ProjectSection(SolutionItems) = preProject
+		docs\en\Xamarin.Geolocation\GeolocationError.xml = docs\en\Xamarin.Geolocation\GeolocationError.xml
+		docs\en\Xamarin.Geolocation\GeolocationException.xml = docs\en\Xamarin.Geolocation\GeolocationException.xml
+		docs\en\Xamarin.Geolocation\Geolocator.xml = docs\en\Xamarin.Geolocation\Geolocator.xml
+		docs\en\Xamarin.Geolocation\Position.xml = docs\en\Xamarin.Geolocation\Position.xml
+		docs\en\Xamarin.Geolocation\PositionErrorEventArgs.xml = docs\en\Xamarin.Geolocation\PositionErrorEventArgs.xml
+		docs\en\Xamarin.Geolocation\PositionEventArgs.xml = docs\en\Xamarin.Geolocation\PositionEventArgs.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6751B61-411C-4D96-B922-40331A397FAD}"
+	ProjectSection(SolutionItems) = preProject
+		component.yaml = component.yaml
+		Details.md = Details.md
+		GettingStarted.md = GettingStarted.md
+		LICENSE.md = LICENSE.md
+		readme.txt = readme.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Mobile.Android", "src\Xamarin.Mobile.Android\Xamarin.Mobile.Android.csproj", "{32DFF77E-AE38-48D6-B067-CF555798EA32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Mobile.iOS", "src\Xamarin.Mobile.iOS\Xamarin.Mobile.iOS.csproj", "{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Mobile", "src\Xamarin.Mobile\Xamarin.Mobile.csproj", "{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|iPhone = Debug|iPhone
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Release|Any CPU = Release|Any CPU
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Release|Mixed Platforms = Release|Mixed Platforms
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{32DFF77E-AE38-48D6-B067-CF555798EA32}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|Any CPU.ActiveCfg = Debug|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|iPhone.Build.0 = Debug|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|Mixed Platforms.ActiveCfg = Debug|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Debug|Mixed Platforms.Build.0 = Debug|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|Any CPU.ActiveCfg = Release|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|iPhone.ActiveCfg = Release|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|iPhone.Build.0 = Release|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|Mixed Platforms.ActiveCfg = Release|iPhone
+		{9A5D042F-607D-4E67-8FCE-176A8A7B21C0}.Release|Mixed Platforms.Build.0 = Release|iPhone
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{64C21DB8-9559-4A7D-97C0-D4FDB69B4EE4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AC43D45B-B591-4C52-B2B4-188B1BD4A53D} = {51FCED1B-4AA7-44D1-8B42-BFC6F683A120}
+		{1B4EBF83-FFBE-4EFD-A912-CA1D8F8A325E} = {51FCED1B-4AA7-44D1-8B42-BFC6F683A120}
+		{6489785D-D135-4E6A-89B0-78E2FBE5CF68} = {51FCED1B-4AA7-44D1-8B42-BFC6F683A120}
+	EndGlobalSection
+EndGlobal
