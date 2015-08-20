@@ -26,7 +26,7 @@ using Xamarin.Media;
 
 namespace Xamarin.Contacts
 {
-   public class Contact
+   public class Contact : IContact
    {
       internal List<Address> addresses = new List<Address>();
       internal List<Email> emails = new List<Email>();
@@ -121,7 +121,7 @@ namespace Xamarin.Contacts
          return (data == null) ? null : BitmapFactory.DecodeByteArray( data, 0, data.Length );
       }
 
-      public Task<MediaFile> SaveThumbnailAsync( String path )
+      public Task<IMediaFile> SaveThumbnailAsync( String path )
       {
          if(path == null)
          {
@@ -138,7 +138,7 @@ namespace Xamarin.Contacts
                }
 
                File.WriteAllBytes( path, bytes );
-               return new MediaFile( path, deletePathOnDispose: false );
+               return (IMediaFile)new MediaFile( path, deletePathOnDispose: false );
             } );
       }
 

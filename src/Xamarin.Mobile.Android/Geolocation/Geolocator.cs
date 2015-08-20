@@ -29,9 +29,9 @@ namespace Xamarin.Geolocation
    {
       private static readonly DateTime Epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
       private readonly LocationManager manager;
-      private readonly Object positionSync = new Object();
-      private readonly String[] providers;
-      private String headingProvider;
+      private readonly object positionSync = new object();
+      private readonly string[] providers;
+      private string headingProvider;
       private Position lastPosition;
       private GeolocationContinuousListener listener;
 
@@ -51,24 +51,24 @@ namespace Xamarin.Geolocation
 
       public event EventHandler<PositionErrorEventArgs> PositionError;
 
-      public Double DesiredAccuracy { get; set; }
+      public double DesiredAccuracy { get; set; }
 
-      public Boolean IsGeolocationAvailable
+      public bool IsGeolocationAvailable
       {
          get { return providers.Length > 0; }
       }
 
-      public Boolean IsGeolocationEnabled
+      public bool IsGeolocationEnabled
       {
          get { return providers.Any( manager.IsProviderEnabled ); }
       }
 
-      public Boolean IsListening
+      public bool IsListening
       {
          get { return listener != null; }
       }
 
-      public Boolean SupportsHeading
+      public bool SupportsHeading
       {
          get
          {
@@ -101,27 +101,27 @@ namespace Xamarin.Geolocation
          return GetPositionAsync( cancelToken, false );
       }
 
-      public Task<Position> GetPositionAsync( CancellationToken cancelToken, Boolean includeHeading )
+      public Task<Position> GetPositionAsync( CancellationToken cancelToken, bool includeHeading )
       {
          return GetPositionAsync( Timeout.Infinite, cancelToken );
       }
 
-      public Task<Position> GetPositionAsync( Int32 timeout )
+      public Task<Position> GetPositionAsync( int timeout )
       {
          return GetPositionAsync( timeout, false );
       }
 
-      public Task<Position> GetPositionAsync( Int32 timeout, Boolean includeHeading )
+      public Task<Position> GetPositionAsync( int timeout, bool includeHeading )
       {
          return GetPositionAsync( timeout, CancellationToken.None );
       }
 
-      public Task<Position> GetPositionAsync( Int32 timeout, CancellationToken cancelToken )
+      public Task<Position> GetPositionAsync( int timeout, CancellationToken cancelToken )
       {
          return GetPositionAsync( timeout, cancelToken, false );
       }
 
-      public Task<Position> GetPositionAsync( Int32 timeout, CancellationToken cancelToken, Boolean includeHeading )
+      public Task<Position> GetPositionAsync( int timeout, CancellationToken cancelToken, bool includeHeading )
       {
          if(timeout <= 0 && timeout != Timeout.Infinite)
          {
@@ -134,12 +134,12 @@ namespace Xamarin.Geolocation
          {
             GeolocationSingleListener singleListener = null;
             singleListener = new GeolocationSingleListener(
-               (Single)DesiredAccuracy,
+               (float)DesiredAccuracy,
                timeout,
                providers.Where( manager.IsProviderEnabled ),
                finishedCallback: () =>
                {
-                  for(Int32 i = 0; i < providers.Length; ++i)
+                  for(int i = 0; i < providers.Length; ++i)
                   {
                      manager.RemoveUpdates( singleListener );
                   }
@@ -152,7 +152,7 @@ namespace Xamarin.Geolocation
                   {
                      singleListener.Cancel();
 
-                     for(Int32 i = 0; i < providers.Length; ++i)
+                     for(int i = 0; i < providers.Length; ++i)
                      {
                         manager.RemoveUpdates( singleListener );
                      }
@@ -164,8 +164,8 @@ namespace Xamarin.Geolocation
             {
                Looper looper = Looper.MyLooper() ?? Looper.MainLooper;
 
-               Int32 enabled = 0;
-               for(Int32 i = 0; i < providers.Length; ++i)
+               int enabled = 0;
+               for(int i = 0; i < providers.Length; ++i)
                {
                   if(manager.IsProviderEnabled( providers[i] ))
                   {
@@ -177,7 +177,7 @@ namespace Xamarin.Geolocation
 
                if(enabled == 0)
                {
-                  for(Int32 i = 0; i < providers.Length; ++i)
+                  for(int i = 0; i < providers.Length; ++i)
                   {
                      manager.RemoveUpdates( singleListener );
                   }
@@ -223,12 +223,12 @@ namespace Xamarin.Geolocation
          return tcs.Task;
       }
 
-      public void StartListening( Int32 minTime, Double minDistance )
+      public void StartListening( int minTime, double minDistance )
       {
          StartListening( minTime, minDistance, false );
       }
 
-      public void StartListening( Int32 minTime, Double minDistance, Boolean includeHeading )
+      public void StartListening( int minTime, double minDistance, bool includeHeading )
       {
          if(minTime < 0)
          {
@@ -248,9 +248,9 @@ namespace Xamarin.Geolocation
          listener.PositionError += OnListenerPositionError;
 
          Looper looper = Looper.MyLooper() ?? Looper.MainLooper;
-         for(Int32 i = 0; i < providers.Length; ++i)
+         for(int i = 0; i < providers.Length; ++i)
          {
-            manager.RequestLocationUpdates( providers[i], minTime, (Single)minDistance, listener, looper );
+            manager.RequestLocationUpdates( providers[i], minTime, (float)minDistance, listener, looper );
          }
       }
 
@@ -264,7 +264,7 @@ namespace Xamarin.Geolocation
          listener.PositionChanged -= OnListenerPositionChanged;
          listener.PositionError -= OnListenerPositionError;
 
-         for(Int32 i = 0; i < providers.Length; ++i)
+         for(int i = 0; i < providers.Length; ++i)
          {
             manager.RemoveUpdates( listener );
          }
@@ -272,7 +272,7 @@ namespace Xamarin.Geolocation
          listener = null;
       }
 
-      private void OnListenerPositionChanged( Object sender, PositionEventArgs e )
+      private void OnListenerPositionChanged( object sender, PositionEventArgs e )
       {
          if(!IsListening) // ignore anything that might come in afterwards
          {
@@ -291,7 +291,7 @@ namespace Xamarin.Geolocation
          }
       }
 
-      private void OnListenerPositionError( Object sender, PositionErrorEventArgs e )
+      private void OnListenerPositionError( object sender, PositionErrorEventArgs e )
       {
          StopListening();
 

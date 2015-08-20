@@ -57,6 +57,7 @@
     <Compile Include="ContentResolverColumnMapping.cs" />
     <Compile Include="GenericQueryReader.cs" />
     <Compile Include="Media\MediaFile.cs" />
+    <Compile Include="Media\MediaFileExtensions.cs" />
     <Compile Include="MemberExpressionFinder.cs" />
     <Compile Include="ProjectionReader.cs" />
     <Compile Include="ContentQueryProvider.cs" />

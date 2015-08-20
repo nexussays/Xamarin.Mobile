@@ -20,19 +20,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
-#if __UNIFIED__
 using AddressBook;
 using UIKit;
 
-#else
-using MonoTouch.AddressBook;
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-#endif
-
 namespace Xamarin.Contacts
 {
-   public class AddressBook : IEnumerable<Contact> //IQueryable<Contact>
+   public class AddressBook : IAddressBook //IQueryable<Contact>
    {
       private ABAddressBook addressBook;
       private IQueryProvider provider;
@@ -59,14 +52,14 @@ namespace Xamarin.Contacts
          get { return true; }
       }
 
-      public IEnumerator<Contact> GetEnumerator()
+      public IEnumerator<IContact> GetEnumerator()
       {
          CheckStatus();
 
          return addressBook.GetPeople().Select( ContactHelper.GetContact ).GetEnumerator();
       }
 
-      public Contact Load( String id )
+      public IContact Load( String id )
       {
          if(String.IsNullOrWhiteSpace( id ))
          {
@@ -158,20 +151,5 @@ namespace Xamarin.Contacts
       {
          return GetEnumerator();
       }
-
-//		Type IQueryable.ElementType
-//		{
-//			get { return typeof(Contact); }
-//		}
-//		
-//		Expression IQueryable.Expression
-//		{
-//			get { return Expression.Constant (this); }
-//		}
-//		
-//		IQueryProvider IQueryable.Provider
-//		{
-//			get { return this.provider; }
-//		}
    }
 }

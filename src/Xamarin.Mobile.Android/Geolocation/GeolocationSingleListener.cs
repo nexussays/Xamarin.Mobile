@@ -32,7 +32,7 @@ namespace Xamarin.Geolocation
       private readonly TaskCompletionSource<Position> completionSource = new TaskCompletionSource<Position>();
       private readonly Single desiredAccuracy;
       private readonly Action finishedCallback;
-      private readonly Object locationSync = new Object();
+      private readonly object locationSync = new object();
       private readonly Timer timer;
       private Location bestLocation;
 
@@ -139,7 +139,7 @@ namespace Xamarin.Geolocation
          completionSource.TrySetResult( p );
       }
 
-      private void TimesUp( Object state )
+      private void TimesUp( object state )
       {
          lock(locationSync)
          {

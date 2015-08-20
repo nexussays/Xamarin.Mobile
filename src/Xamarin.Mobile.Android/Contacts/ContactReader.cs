@@ -1,4 +1,3 @@
-using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -14,7 +13,7 @@ using System;
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +21,6 @@ using System.Text;
 using Android.Content;
 using Android.Content.Res;
 using Android.Database;
-using Android.Net;
 using Android.Provider;
 
 namespace Xamarin.Contacts
@@ -46,7 +44,7 @@ namespace Xamarin.Contacts
 
       public IEnumerator<Contact> GetEnumerator()
       {
-         Uri table = (rawContacts) ? ContactsContract.RawContacts.ContentUri : ContactsContract.Contacts.ContentUri;
+         var table = (rawContacts) ? ContactsContract.RawContacts.ContentUri : ContactsContract.Contacts.ContentUri;
 
          String query = null;
          String[] parameters = null;
@@ -73,7 +71,7 @@ namespace Xamarin.Contacts
 
             if(translator.Skip > 0 || translator.Take > 0)
             {
-               StringBuilder limitb = new StringBuilder();
+               var limitb = new StringBuilder();
 
                if(sortString == null)
                {

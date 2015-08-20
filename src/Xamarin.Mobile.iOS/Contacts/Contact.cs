@@ -24,6 +24,7 @@ using Xamarin.Media;
 using AddressBook;
 using Foundation;
 using UIKit;
+
 #else
 using MonoTouch.AddressBook;
 using MonoTouch.CoreGraphics;
@@ -33,7 +34,7 @@ using MonoTouch.UIKit;
 
 namespace Xamarin.Contacts
 {
-   public class Contact
+   public class Contact : IContact
    {
       internal List<Address> addresses = new List<Address>();
       internal List<Email> emails = new List<Email>();
@@ -139,17 +140,17 @@ namespace Xamarin.Contacts
          return UIImage.LoadFromData( data );
       }
 
-      public Task<MediaFile> SaveThumbnailAsync( String path )
+      public Task<IMediaFile> SaveThumbnailAsync( String path )
       {
          if(path == null)
          {
             throw new ArgumentNullException( "path" );
          }
 
-         return Task<MediaFile>.Factory.StartNew(
+         return Task<IMediaFile>.Factory.StartNew(
             s =>
             {
-               String p = (String)s;
+               var p = (String)s;
 
                using(UIImage img = GetThumbnail())
                {
@@ -158,8 +159,8 @@ namespace Xamarin.Contacts
                      return null;
                   }
 
-                  using(NSDataStream stream = new NSDataStream( img.AsJPEG() ))
-                  using(Stream fs = File.OpenWrite( p ))
+                  using(var stream = new NSDataStream( img.AsJPEG() ))
+                  using(var fs = File.OpenWrite( p ))
                   {
                      stream.CopyTo( fs );
                      fs.Flush();

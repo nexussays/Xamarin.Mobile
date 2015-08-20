@@ -40,6 +40,8 @@
     <Compile Include="Contacts\Account.cs" />
     <Compile Include="Contacts\Address.cs" />
     <Compile Include="Contacts\Email.cs" />
+    <Compile Include="Contacts\IAddressBook.cs" />
+    <Compile Include="Contacts\IContact.cs" />
     <Compile Include="Contacts\InstantMessangingAccount.cs" />
     <Compile Include="Contacts\Note.cs" />
     <Compile Include="Contacts\Organization.cs" />
@@ -49,6 +51,7 @@
     <Compile Include="EvaluationNominator.cs" />
     <Compile Include="ExpressionEvaluator.cs" />
     <Compile Include="ExpressionVisitor.cs" />
+    <Compile Include="Media\IMediaFile.cs" />
     <Compile Include="Media\MediaExtensions.cs" />
     <Compile Include="Media\MediaFile.cs" />
     <Compile Include="Media\MediaFileNotFoundException.cs" />

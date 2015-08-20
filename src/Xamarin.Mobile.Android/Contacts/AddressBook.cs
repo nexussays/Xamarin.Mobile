@@ -25,12 +25,15 @@ using Android.Content.Res;
 using Android.Database;
 using Android.Provider;
 using Java.Lang;
+using Boolean = System.Boolean;
 using String = System.String;
 using Uri = Android.Net.Uri;
 
 namespace Xamarin.Contacts
 {
-   public sealed class AddressBook : IQueryable<Contact>
+   public sealed class AddressBook
+      : IQueryable<IContact>,
+        IAddressBook
    {
       private readonly ContactQueryProvider contactsProvider;
       private readonly ContentResolver content;
@@ -89,7 +92,7 @@ namespace Xamarin.Contacts
          get { return contactsProvider; }
       }
 
-      public IEnumerator<Contact> GetEnumerator()
+      public IEnumerator<IContact> GetEnumerator()
       {
          return ContactHelper.GetContacts( !PreferContactAggregation, content, resources ).GetEnumerator();
       }
@@ -101,7 +104,7 @@ namespace Xamarin.Contacts
       /// <returns>The <see cref="Contact" /> if found, <c>null</c> otherwise.</returns>
       /// <exception cref="ArgumentNullException"><paramref name="id" /> is <c>null</c>.</exception>
       /// <exception cref="ArgumentException"><paramref name="id" /> is empty.</exception>
-      public Contact Load( String id )
+      public IContact Load( String id )
       {
          if(id == null)
          {

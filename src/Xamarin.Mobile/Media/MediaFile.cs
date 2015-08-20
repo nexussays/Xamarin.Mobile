@@ -19,7 +19,9 @@ using System.IO;
 
 namespace Xamarin.Media
 {
-   public sealed class MediaFile : IDisposable
+   public sealed class MediaFile
+      : IDisposable,
+        IMediaFile
    {
       private readonly Action<Boolean> dispose;
       private readonly String path;
