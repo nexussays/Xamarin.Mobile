@@ -24,9 +24,6 @@ using Android.Content;
 using Android.Content.Res;
 using Android.Database;
 using Android.Provider;
-using Java.Lang;
-using Boolean = System.Boolean;
-using String = System.String;
 using Uri = Android.Net.Uri;
 
 namespace Xamarin.Contacts
@@ -148,17 +145,16 @@ namespace Xamarin.Contacts
          return Task.Factory.StartNew(
             () =>
             {
-               try
-               {
-                  ICursor cursor = content.Query( ContactsContract.Data.ContentUri, null, null, null, null );
-                  cursor.Dispose();
-
-                  return true;
-               }
-               catch(SecurityException)
-               {
-                  return false;
-               }
+               //try
+               //{
+               ICursor cursor = content.Query( ContactsContract.Data.ContentUri, null, null, null, null );
+               cursor.Dispose();
+               return true;
+               //}
+               //catch(SecurityException)
+               //{
+               //   return false;
+               //}
             } );
       }
 

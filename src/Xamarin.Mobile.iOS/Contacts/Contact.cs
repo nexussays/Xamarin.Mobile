@@ -122,7 +122,7 @@ namespace Xamarin.Contacts
          set { websites = new List<Website>( value ); }
       }
 
-      public UIImage GetThumbnail()
+      public Object GetThumbnail()
       {
          if(!person.HasImage)
          {
@@ -152,7 +152,7 @@ namespace Xamarin.Contacts
             {
                var p = (String)s;
 
-               using(UIImage img = GetThumbnail())
+               using(UIImage img = this.GetThumbnailAsUIImage())
                {
                   if(img == null)
                   {
@@ -174,5 +174,13 @@ namespace Xamarin.Contacts
 
       [DllImport( "/System/Library/Frameworks/AddressBook.framework/AddressBook" )]
       private static extern IntPtr ABPersonCopyImageDataWithFormat( IntPtr handle, ABPersonImageFormat format );
+   }
+
+   public static class ContactExtensions
+   {
+      public static UIImage GetThumbnailAsUIImage( this Contact contact )
+      {
+         return (UIImage)contact.GetThumbnail();
+      }
    }
 }

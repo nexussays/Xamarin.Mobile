@@ -115,7 +115,7 @@ namespace Xamarin.Contacts
          set { websites = new List<Website>( value ); }
       }
 
-      public Bitmap GetThumbnail()
+      public Object GetThumbnail()
       {
          Byte[] data = GetThumbnailBytes();
          return (data == null) ? null : BitmapFactory.DecodeByteArray( data, 0, data.Length );
@@ -176,6 +176,14 @@ namespace Xamarin.Contacts
          }
 
          return null;
+      }
+   }
+
+   public static class ContactExtensions
+   {
+      public static Bitmap GetThumbnailAsBitmap( this Contact contact )
+      {
+         return (Bitmap)contact.GetThumbnail();
       }
    }
 }

@@ -41,8 +41,12 @@ namespace Xamarin.Contacts
 
       IEnumerable<Website> Websites { get; set; }
 
-      //Bitmap GetThumbnail();
-      //UIImage GetThumbnail();
+      /// <summary>
+      /// Bitmap GetThumbnail();
+      /// UIImage GetThumbnail();
+      /// </summary>
+      Object GetThumbnail();
+
       Task<IMediaFile> SaveThumbnailAsync( String path );
    }
 }
