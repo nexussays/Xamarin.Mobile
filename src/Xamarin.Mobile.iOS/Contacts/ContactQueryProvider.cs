@@ -24,11 +24,11 @@ namespace Xamarin.Contacts
 {
    internal class ContactQueryProvider : IQueryProvider
    {
-      private readonly ABAddressBook addressBook;
+      private readonly ABAddressBook m_addressBook;
 
       internal ContactQueryProvider( ABAddressBook addressBook )
       {
-         this.addressBook = addressBook;
+         m_addressBook = addressBook;
       }
 
       IQueryable IQueryProvider.CreateQuery( Expression expression )
@@ -43,18 +43,13 @@ namespace Xamarin.Contacts
 
       Object IQueryProvider.Execute( Expression expression )
       {
-         IQueryable<Contact> q = GetContacts().AsQueryable();
-
+         var q = GetContacts().AsQueryable();
          expression = ReplaceQueryable( expression, q );
-
          if(expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(IOrderedQueryable<>))
          {
             return q.Provider.CreateQuery( expression );
          }
-         else
-         {
-            return q.Provider.Execute( expression );
-         }
+         return q.Provider.Execute( expression );
       }
 
       TResult IQueryProvider.Execute<TResult>( Expression expression )
@@ -62,9 +57,9 @@ namespace Xamarin.Contacts
          return (TResult)((IQueryProvider)this).Execute( expression );
       }
 
-      private IEnumerable<Contact> GetContacts()
+      private IEnumerable<IContact> GetContacts()
       {
-         return addressBook.GetPeople().Select( ContactHelper.GetContact );
+         return m_addressBook.GetPeople().Select( ContactHelper.GetContact );
       }
 
       private static Expression ReplaceQueryable( Expression expression, Object value )
