@@ -18,12 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-#if __UNIFIED__
 using AddressBook;
-
-#else
-using MonoTouch.AddressBook;
-#endif
 
 namespace Xamarin.Contacts
 {
@@ -72,9 +67,9 @@ namespace Xamarin.Contacts
          return addressBook.GetPeople().Select( ContactHelper.GetContact );
       }
 
-      private Expression ReplaceQueryable( Expression expression, Object value )
+      private static Expression ReplaceQueryable( Expression expression, Object value )
       {
-         MethodCallExpression mc = expression as MethodCallExpression;
+         var mc = expression as MethodCallExpression;
          if(mc != null)
          {
             Expression[] args = mc.Arguments.ToArray();
@@ -90,7 +85,7 @@ namespace Xamarin.Contacts
             }
          }
 
-         ConstantExpression c = expression as ConstantExpression;
+         var c = expression as ConstantExpression;
          if(c != null && c.Type.GetInterfaces().Contains( typeof(IQueryable<Contact>) ))
          {
             return Expression.Constant( value );

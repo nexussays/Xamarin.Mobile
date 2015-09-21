@@ -55,7 +55,6 @@ namespace Xamarin.Contacts
       public IEnumerator<IContact> GetEnumerator()
       {
          CheckStatus();
-
          return addressBook.GetPeople().Select( ContactHelper.GetContact ).GetEnumerator();
       }
 

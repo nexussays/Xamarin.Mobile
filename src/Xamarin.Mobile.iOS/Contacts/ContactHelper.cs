@@ -1,4 +1,3 @@
-using System;
 //
 //  Copyright 2011-2013, Xamarin Inc.
 //
@@ -15,16 +14,11 @@ using System;
 //    limitations under the License.
 //
 
+using System;
 using System.Globalization;
 using System.Linq;
-#if __UNIFIED__
 using AddressBook;
 using Foundation;
-
-#else
-using MonoTouch.AddressBook;
-using MonoTouch.Foundation;
-#endif
 
 namespace Xamarin.Contacts
 {
@@ -44,9 +38,9 @@ namespace Xamarin.Contacts
          return AddressType.Other;
       }
 
-      internal static Contact GetContact( ABPerson person )
+      internal static IContact GetContact( ABPerson person )
       {
-         Contact contact = new Contact( person )
+         var contact = new Contact( person )
          {
             DisplayName = person.ToString(),
             Prefix = person.Prefix,
@@ -54,32 +48,29 @@ namespace Xamarin.Contacts
             MiddleName = person.MiddleName,
             LastName = person.LastName,
             Suffix = person.Suffix,
-            Nickname = person.Nickname
+            Nickname = person.Nickname,
+            Notes = (person.Note != null) ? new[] {new Note {Contents = person.Note}} : new Note[0],
+            Emails =
+               person.GetEmails()
+                     .Select(
+                        e =>
+                           new Email
+                           {
+                              Address = e.Value,
+                              Type = GetEmailType( e.Label ),
+                              Label = (e.Label != null) ? GetLabel( e.Label ) : GetLabel( ABLabel.Other )
+                           } ),
+            Phones =
+               person.GetPhones()
+                     .Select(
+                        p =>
+                           new Phone
+                           {
+                              Number = p.Value,
+                              Type = GetPhoneType( p.Label ),
+                              Label = (p.Label != null) ? GetLabel( p.Label ) : GetLabel( ABLabel.Other )
+                           } )
          };
-
-         contact.Notes = (person.Note != null) ? new[] {new Note {Contents = person.Note}} : new Note[0];
-
-         contact.Emails =
-            person.GetEmails()
-                  .Select(
-                     e =>
-                        new Email
-                        {
-                           Address = e.Value,
-                           Type = GetEmailType( e.Label ),
-                           Label = (e.Label != null) ? GetLabel( e.Label ) : GetLabel( ABLabel.Other )
-                        } );
-
-         contact.Phones =
-            person.GetPhones()
-                  .Select(
-                     p =>
-                        new Phone
-                        {
-                           Number = p.Value,
-                           Type = GetPhoneType( p.Label ),
-                           Label = (p.Label != null) ? GetLabel( p.Label ) : GetLabel( ABLabel.Other )
-                        } );
 
          Organization[] orgs;
          if(person.Organization != null)
@@ -100,7 +91,6 @@ namespace Xamarin.Contacts
 
          contact.Organizations = orgs;
 
-#if __UNIFIED__
          contact.InstantMessagingAccounts =
             person.GetInstantMessageServices()
                   .Select(
@@ -126,25 +116,6 @@ namespace Xamarin.Contacts
                            Country = a.Value.Country,
                            PostalCode = a.Value.Zip
                         } );
-#else
-			contact.InstantMessagingAccounts = person.GetInstantMessages().Select (ima => new InstantMessagingAccount()
-			{
-				Service = GetImService ((NSString)ima.Value[ABPersonInstantMessageKey.Service]),
-				ServiceLabel = (NSString)ima.Value[ABPersonInstantMessageKey.Service],
-				Account = (NSString)ima.Value[ABPersonInstantMessageKey.Username]
-			});
-
-			contact.Addresses = person.GetAddresses().Select (a => new Address()
-			{
-				Type = GetAddressType (a.Label),
-				Label = (a.Label != null) ? GetLabel (a.Label) : GetLabel (ABLabel.Other),
-				StreetAddress = (NSString)a.Value[ABPersonAddressKey.Street],
-				City = (NSString)a.Value[ABPersonAddressKey.City],
-				Region = (NSString)a.Value[ABPersonAddressKey.State],
-				Country = (NSString)a.Value[ABPersonAddressKey.Country],
-				PostalCode = (NSString)a.Value[ABPersonAddressKey.Zip]
-			});
-			#endif
 
          contact.Websites = person.GetUrls().Select( url => new Website {Address = url.Value} );
 

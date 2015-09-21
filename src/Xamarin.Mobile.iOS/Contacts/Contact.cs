@@ -19,18 +19,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Xamarin.Media;
-#if __UNIFIED__
 using AddressBook;
 using Foundation;
 using UIKit;
-
-#else
-using MonoTouch.AddressBook;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-#endif
+using Xamarin.Media;
 
 namespace Xamarin.Contacts
 {
