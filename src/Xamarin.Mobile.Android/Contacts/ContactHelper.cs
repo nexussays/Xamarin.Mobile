@@ -95,21 +95,25 @@ namespace Xamarin.Contacts
          return a;
       }
 
-      internal static Contact GetContact( Boolean rawContact, ContentResolver content, Resources resources, ICursor cursor )
+      internal static Contact GetContact( Boolean rawContact, ContentResolver content, Resources resources,
+                                          ICursor cursor )
       {
          String id = (rawContact)
             ? cursor.GetString( cursor.GetColumnIndex( ContactsContract.RawContactsColumns.ContactId ) )
             : cursor.GetString( cursor.GetColumnIndex( ContactsContract.ContactsColumns.LookupKey ) );
 
-         Contact contact = new Contact( id, !rawContact, content );
-         contact.DisplayName = GetString( cursor, ContactsContract.ContactsColumns.DisplayName );
+         var contact = new Contact( id, !rawContact, content )
+         {
+            DisplayName = GetString( cursor, ContactsContract.ContactsColumns.DisplayName )
+         };
 
          FillContactExtras( rawContact, content, resources, id, contact );
 
          return contact;
       }
 
-      internal static IEnumerable<Contact> GetContacts( Boolean rawContacts, ContentResolver content, Resources resources )
+      internal static IEnumerable<Contact> GetContacts( Boolean rawContacts, ContentResolver content,
+                                                        Resources resources )
       {
          Uri curi = (rawContacts) ? ContactsContract.RawContacts.ContentUri : ContactsContract.Contacts.ContentUri;
 
@@ -184,8 +188,8 @@ namespace Xamarin.Contacts
          }
       }
 
-      internal static IEnumerable<Contact> GetContacts( Boolean rawContacts, ContentResolver content, Resources resources,
-                                                        String[] ids )
+      internal static IEnumerable<Contact> GetContacts( Boolean rawContacts, ContentResolver content,
+                                                        Resources resources, String[] ids )
       {
          ICursor c = null;
 
@@ -193,7 +197,7 @@ namespace Xamarin.Contacts
             ? ContactsContract.RawContactsColumns.ContactId
             : ContactsContract.ContactsColumns.LookupKey;
 
-         StringBuilder whereb = new StringBuilder();
+         var whereb = new StringBuilder();
          for(Int32 i = 0; i < ids.Length; i++)
          {
             if(i > 0)
@@ -244,8 +248,7 @@ namespace Xamarin.Contacts
                      }
                   }
 
-                  currentContact = new Contact( id, !rawContacts, content );
-                  currentContact.DisplayName = c.GetString( dnIndex );
+                  currentContact = new Contact( id, !rawContacts, content ) {DisplayName = c.GetString( dnIndex )};
                }
 
                FillContactWithRow( resources, currentContact, c );

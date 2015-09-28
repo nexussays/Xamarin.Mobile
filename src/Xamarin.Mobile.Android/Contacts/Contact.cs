@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Android.Content;
-using Android.Database;
-using Android.Graphics;
 using Android.Provider;
 using Xamarin.Media;
 
@@ -36,15 +34,16 @@ namespace Xamarin.Contacts
       internal List<Phone> phones = new List<Phone>();
       internal List<Relationship> relationships = new List<Relationship>();
       internal List<Website> websites = new List<Website>();
-      private readonly ContentResolver content;
+
+      private readonly ContentResolver m_contentResolver;
 
       public Contact()
       {
       }
 
-      internal Contact( String id, Boolean isAggregate, ContentResolver content )
+      internal Contact( String id, Boolean isAggregate, ContentResolver contentResolver )
       {
-         this.content = content;
+         m_contentResolver = contentResolver;
          IsAggregate = isAggregate;
          Id = id;
       }
@@ -115,10 +114,40 @@ namespace Xamarin.Contacts
          set { websites = new List<Website>( value ); }
       }
 
-      public Object GetThumbnail()
+      public Byte[] GetThumbnail()
       {
-         Byte[] data = GetThumbnailBytes();
-         return (data == null) ? null : BitmapFactory.DecodeByteArray( data, 0, data.Length );
+         var lookupColumn = (IsAggregate)
+            ? ContactsContract.ContactsColumns.LookupKey
+            : ContactsContract.RawContactsColumns.ContactId;
+         var projection = new[]
+         {
+            ContactsContract.CommonDataKinds.Photo.PhotoColumnId,
+            ContactsContract.DataColumns.Mimetype,
+         };
+         var uri = ContactsContract.Data.ContentUri;
+         //uri = Android.Net.Uri.WithAppendedPath(ContentUris.WithAppendedId(uri, Id), ContactsContract.Contacts.Photo.ContentDirectory);
+         using(
+            var cursor = m_contentResolver.Query(
+               uri,
+               projection,
+               lookupColumn + "=? AND " + ContactsContract.DataColumns.Mimetype + "=?",
+               new[] {Id, ContactsContract.CommonDataKinds.Photo.ContentItemType},
+               null ))
+         {
+            if(cursor.MoveToFirst())
+            {
+               do
+               {
+                  var bytes = cursor.GetBlob( cursor.GetColumnIndex( projection[0] ) );
+                  if(bytes != null)
+                  {
+                     // return BitmapFactory.DecodeByteArray( bytes, 0, bytes.Length );
+                     return bytes;
+                  }
+               } while(cursor.MoveToNext());
+            }
+         }
+         return null;
       }
 
       public Task<IMediaFile> SaveThumbnailAsync( String path )
@@ -131,7 +160,7 @@ namespace Xamarin.Contacts
          return Task.Factory.StartNew(
             () =>
             {
-               Byte[] bytes = GetThumbnailBytes();
+               var bytes = GetThumbnail();
                if(bytes == null)
                {
                   return null;
@@ -140,50 +169,6 @@ namespace Xamarin.Contacts
                File.WriteAllBytes( path, bytes );
                return (IMediaFile)new MediaFile( path, deletePathOnDispose: false );
             } );
-      }
-
-      private Byte[] GetThumbnailBytes()
-      {
-         String lookupColumn = (IsAggregate)
-            ? ContactsContract.ContactsColumns.LookupKey
-            : ContactsContract.RawContactsColumns.ContactId;
-
-         ICursor c = null;
-         try
-         {
-            c = content.Query(
-               ContactsContract.Data.ContentUri,
-               new[] {ContactsContract.CommonDataKinds.Photo.PhotoColumnId, ContactsContract.DataColumns.Mimetype},
-               lookupColumn + "=? AND " + ContactsContract.DataColumns.Mimetype + "=?",
-               new[] {Id, ContactsContract.CommonDataKinds.Photo.ContentItemType},
-               null );
-
-            while(c.MoveToNext())
-            {
-               Byte[] tdata = c.GetBlob( c.GetColumnIndex( ContactsContract.CommonDataKinds.Photo.PhotoColumnId ) );
-               if(tdata != null)
-               {
-                  return tdata;
-               }
-            }
-         }
-         finally
-         {
-            if(c != null)
-            {
-               c.Close();
-            }
-         }
-
-         return null;
-      }
-   }
-
-   public static class ContactExtensions
-   {
-      public static Bitmap GetThumbnailAsBitmap( this Contact contact )
-      {
-         return (Bitmap)contact.GetThumbnail();
       }
    }
 }

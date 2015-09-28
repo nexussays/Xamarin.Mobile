@@ -114,22 +114,28 @@ namespace Xamarin.Contacts
          set { websites = new List<Website>( value ); }
       }
 
-      public Object GetThumbnail()
+      public Byte[] GetThumbnail()
       {
-         if(!person.HasImage)
+         using(var input = GetThumbnailAsUIImage().AsPNG().AsStream())
          {
-            return null;
+            if(input is MemoryStream)
+            {
+               return ((MemoryStream)input).ToArray();
+            }
+            else
+            {
+               using(var output = new MemoryStream())
+               {
+                  Int32 read;
+                  var buffer = new Byte[4096];
+                  while((read = input.Read( buffer, 0, buffer.Length )) > 0)
+                  {
+                     output.Write( buffer, 0, read );
+                  }
+                  return output.ToArray();
+               }
+            }
          }
-
-         NSData data;
-         lock(person) data = person.GetImage( ABPersonImageFormat.Thumbnail );
-
-         if(data == null)
-         {
-            return null;
-         }
-
-         return UIImage.LoadFromData( data );
       }
 
       public Task<IMediaFile> SaveThumbnailAsync( String path )
@@ -144,7 +150,7 @@ namespace Xamarin.Contacts
             {
                var p = (String)s;
 
-               using(UIImage img = this.GetThumbnailAsUIImage())
+               using(UIImage img = GetThumbnailAsUIImage())
                {
                   if(img == null)
                   {
@@ -164,15 +170,24 @@ namespace Xamarin.Contacts
             path );
       }
 
+      private UIImage GetThumbnailAsUIImage()
+      {
+         if(!person.HasImage)
+         {
+            return null;
+         }
+
+         NSData data;
+         lock(person) data = person.GetImage( ABPersonImageFormat.Thumbnail );
+
+         if(data == null)
+         {
+            return null;
+         }
+         return UIImage.LoadFromData( data );
+      }
+
       [DllImport( "/System/Library/Frameworks/AddressBook.framework/AddressBook" )]
       private static extern IntPtr ABPersonCopyImageDataWithFormat( IntPtr handle, ABPersonImageFormat format );
-   }
-
-   public static class ContactExtensions
-   {
-      public static UIImage GetThumbnailAsUIImage( this Contact contact )
-      {
-         return (UIImage)contact.GetThumbnail();
-      }
    }
 }
