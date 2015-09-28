@@ -116,14 +116,15 @@ namespace Xamarin.Contacts
 
       public Byte[] GetThumbnail()
       {
-         using(var input = GetThumbnailAsUIImage().AsPNG().AsStream())
+         var img = GetThumbnailAsUIImage();
+         if(img != null)
          {
-            if(input is MemoryStream)
+            using(var input = img.AsPNG().AsStream())
             {
-               return ((MemoryStream)input).ToArray();
-            }
-            else
-            {
+               if(input is MemoryStream)
+               {
+                  return ((MemoryStream)input).ToArray();
+               }
                using(var output = new MemoryStream())
                {
                   Int32 read;
@@ -136,6 +137,7 @@ namespace Xamarin.Contacts
                }
             }
          }
+         return null;
       }
 
       public Task<IMediaFile> SaveThumbnailAsync( String path )
