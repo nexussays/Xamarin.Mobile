@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
@@ -55,7 +56,15 @@ namespace Xamarin.Contacts
       public IEnumerator<IContact> GetEnumerator()
       {
          CheckStatus();
-         return addressBook.GetPeople().Select( ContactHelper.GetContact ).GetEnumerator();
+         try
+         {
+            return addressBook.GetPeople().Select( ContactHelper.GetContact ).GetEnumerator();
+         }
+         catch(Exception ex)
+         {
+            Debug.Write( ex );
+            return Enumerable.Empty<IContact>().GetEnumerator();
+         }
       }
 
       public IContact Load( String id )
