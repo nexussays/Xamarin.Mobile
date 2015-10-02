@@ -48,6 +48,7 @@
     <Compile Include="Contacts\Phone.cs" />
     <Compile Include="Contacts\Relationship.cs" />
     <Compile Include="Contacts\Website.cs" />
+    <Compile Include="DeviceAccountInfo.cs" />
     <Compile Include="EvaluationNominator.cs" />
     <Compile Include="ExpressionEvaluator.cs" />
     <Compile Include="ExpressionVisitor.cs" />

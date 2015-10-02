@@ -15,6 +15,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using AddressBook;
@@ -117,7 +118,15 @@ namespace Xamarin.Contacts
                            PostalCode = a.Value.Zip
                         } );
 
-         contact.Websites = person.GetUrls().Select( url => new Website {Address = url.Value} );
+         try
+         {
+            contact.Websites = person.GetUrls().Select(url => new Website { Address = url.Value });
+         }
+         catch(Exception)
+         {
+            contact.Websites = new List<Website>();
+         }
+         
 
          contact.Relationships =
             person.GetRelatedNames().Select( p => new Relationship {Name = p.Value, Type = GetRelationType( p.Label )} );

@@ -55,6 +55,7 @@
     <Compile Include="Contacts\ContactReader.cs" />
     <Compile Include="Contacts\ContactTableFinder.cs" />
     <Compile Include="ContentResolverColumnMapping.cs" />
+    <Compile Include="DeviceAccountInfo.cs" />
     <Compile Include="GenericQueryReader.cs" />
     <Compile Include="Media\MediaFile.cs" />
     <Compile Include="Media\MediaFileExtensions.cs" />
