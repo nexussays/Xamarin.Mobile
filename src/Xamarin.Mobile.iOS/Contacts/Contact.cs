@@ -59,17 +59,7 @@ namespace Xamarin.Contacts
       public IEnumerable<Email> Emails
       {
          get { return emails; }
-         set
-         {
-            try
-            {
-               emails = new List<Email>( value );
-            }
-            catch(Exception)
-            {
-               emails = new List<Email>();
-            }
-         }
+         set { emails = new List<Email>( value ); }
       }
 
       public String FirstName { get; set; }

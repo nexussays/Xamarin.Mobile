@@ -51,7 +51,10 @@ namespace Xamarin.Contacts
             Suffix = person.Suffix,
             Nickname = person.Nickname,
             Notes = (person.Note != null) ? new[] {new Note {Contents = person.Note}} : new Note[0],
-            Emails =
+         };
+         try
+         {
+            contact.Emails =
                person.GetEmails()
                      .Select(
                         e =>
@@ -60,8 +63,15 @@ namespace Xamarin.Contacts
                               Address = e.Value,
                               Type = GetEmailType( e.Label ),
                               Label = (e.Label != null) ? GetLabel( e.Label ) : GetLabel( ABLabel.Other )
-                           } ),
-            Phones =
+                           } );
+         }
+         catch(Exception)
+         {
+            contact.Emails = new List<Email>();
+         }
+         try
+         {
+            contact.Phones =
                person.GetPhones()
                      .Select(
                         p =>
@@ -70,9 +80,12 @@ namespace Xamarin.Contacts
                               Number = p.Value,
                               Type = GetPhoneType( p.Label ),
                               Label = (p.Label != null) ? GetLabel( p.Label ) : GetLabel( ABLabel.Other )
-                           } )
-         };
-
+                           } );
+         }
+         catch(Exception)
+         {
+            contact.Phones = new List<Phone>();
+         }
          Organization[] orgs;
          if(person.Organization != null)
          {
@@ -120,13 +133,12 @@ namespace Xamarin.Contacts
 
          try
          {
-            contact.Websites = person.GetUrls().Select(url => new Website { Address = url.Value });
+            contact.Websites = person.GetUrls().Select( url => new Website {Address = url.Value} );
          }
          catch(Exception)
          {
             contact.Websites = new List<Website>();
          }
-         
 
          contact.Relationships =
             person.GetRelatedNames().Select( p => new Relationship {Name = p.Value, Type = GetRelationType( p.Label )} );
