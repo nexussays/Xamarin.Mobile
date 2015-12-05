@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -24,6 +25,9 @@ using Android.Content;
 using Android.Content.Res;
 using Android.Database;
 using Android.Provider;
+using Java.Lang;
+using Boolean = System.Boolean;
+using String = System.String;
 using Uri = Android.Net.Uri;
 
 namespace Xamarin.Contacts
@@ -142,19 +146,20 @@ namespace Xamarin.Contacts
 
       public Task<Boolean> RequestPermission()
       {
-         return Task.Factory.StartNew(
+         return Task.Run(
             () =>
             {
-               //try
-               //{
-               ICursor cursor = content.Query( ContactsContract.Data.ContentUri, null, null, null, null );
-               cursor.Dispose();
-               return true;
-               //}
-               //catch(SecurityException)
-               //{
-               //   return false;
-               //}
+               try
+               {
+                  ICursor cursor = content.Query( ContactsContract.Data.ContentUri, null, null, null, null );
+                  cursor.Dispose();
+                  return true;
+               }
+               catch(SecurityException ex)
+               {
+                  Debug.WriteLine( ex.ToString() );
+                  return false;
+               }
             } );
       }
 
