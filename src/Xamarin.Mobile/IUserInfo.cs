@@ -2,7 +2,7 @@
 
 namespace Xamarin
 {
-   public interface IDeviceAccountInfo
+   public interface IUserInfo
    {
       String PhoneNumber { get; }
    }

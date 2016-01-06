@@ -42,7 +42,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="DeviceAccountInfo.cs" />
+    <Compile Include="DeviceInfo.cs" />
+    <Compile Include="UserInfo.cs" />
     <Compile Include="Media\MediaPickerController.cs" />
     <Compile Include="NSErrorException.cs" />
     <Compile Include="Geolocation\GeolocationSingleUpdateDelegate.cs" />
